@@ -110,7 +110,7 @@ function start_interactive(data) {
 $(function () {
 
   var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-  var ws_path = ws_scheme + '://' + window.location.host + "/multiplayer/lobby/";
+  var ws_path = ws_scheme + '://' + window.location.host + "/multiplayer/lobby/" + groupId;
 
   // console.log("Connecting to " + ws_path);
   socket = new ReconnectingWebSocket(ws_path);

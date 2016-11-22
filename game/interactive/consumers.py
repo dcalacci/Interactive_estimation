@@ -93,6 +93,9 @@ def lobby(message):
     if not user.is_authenticated:
         return redirect('/')
 
+    group_id = message['path'].split('/')[-1]
+    group_id = None if group_id == 'null' else group_id
+
     try:
         game_settings = Settings.objects.order_by('?')[0]
     except Settings.DoesNotExist:
@@ -100,10 +103,18 @@ def lobby(message):
 
     try:
         with transaction.atomic():
-            game = Interactive.objects.get(users=user)
+            if group_id:
+                print("have a group ID, getting the right game...", group_id)
+                game = Interactive.objects.get(
+                    Q(users=user),
+                    Q(group=group_id)
+                )
+            else:
+                game = Interactive.objects.get(users=user)
     except Interactive.DoesNotExist:
         game = None
 
+    print("game:", game)
     if game:
         # user has already been assigned to a game
         # todo: connect him to the game
@@ -136,7 +147,7 @@ def lobby(message):
             pass
         return
 
-    games = Interactive.objects.filter(started=False).annotate(num_of_users=Count('users')).order_by('-num_of_users')
+    games = Interactive.objects.filter(started=False, group=group_id).annotate(num_of_users=Count('users')).order_by('-num_of_users')
 
     if games:
         for game in games:
@@ -150,7 +161,7 @@ def lobby(message):
             logging.error("User couldn't be assigned to a game")
             return
     else:
-        game = Interactive.objects.create(constraints=game_settings)
+        game = Interactive.objects.create(constraints=game_settings, group=group_id)
         game.users.add(user)
         user.avatar = avatar()
         user.save()

@@ -32,13 +32,14 @@ def assign(request):
 
 
 # Create your views here.
-def lobby(request):
+def lobby(request, group_id=""):
     if request.user.is_anonymous:
         u, password = random_user('i')
         u = authenticate(username=u.username, password=password)
         login(request, u)
     else:
         u = request.user
+        request.groupId = group_id
         if u.game_type != 'i':
             return redirect('/')
 

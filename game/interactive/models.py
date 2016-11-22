@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from channels import Group
 
@@ -75,6 +76,7 @@ class Interactive(models.Model):
     users = models.ManyToManyField(settings.AUTH_USER_MODEL)
     start_time = models.DateTimeField(auto_now_add=True, null=True)
     end_time = models.DateTimeField(null=True)
+    group = models.CharField(_('Group ID'), blank=True, max_length=255)
 
     constraints = models.ForeignKey(Settings, on_delete=models.CASCADE)
 
