@@ -72,6 +72,7 @@ def start(request):
         print("User is authenticated")
         c = request.user.game_type
 
+    return redirect('interactive:lobby')
     if c == 'i':
         return redirect('interactive:lobby')
     elif c == 'c':

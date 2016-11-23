@@ -67,11 +67,20 @@ def get_round(game, user=None):
 
     return {'plot': plot.plot, 'remaining': remaining, 'current_round': current_round}
 
+def group_from_message(message):
+    group_id = message['path'].split('/')[-1]
+    group_id = None if group_id == 'null' else group_id
+    return group_id 
+
 
 def user_and_game(message):
     user = message.user
+    group_id = group_from_message(message)
     if user.is_authenticated:
-        game = Interactive.objects.get(users=user)
+        game = Interactive.objects.get(
+            Q(users=user),
+            Q(group=group_id)
+        )
     else:
         logging.error('User is anonymous and needs to login')
         raise Exception('User is Anonymous')
