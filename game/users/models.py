@@ -23,6 +23,7 @@ class User(AbstractUser):
         ('c', 'Control'),
         ('i', 'Interactive'),
     ))
+    linked_id = models.CharField(_('Linked User ID'), blank=True, max_length=255)
     avatar = models.URLField(null=True)
 
     def __str__(self):

@@ -24,6 +24,15 @@
             {% endif %}
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% if not request.linkedId %}
+            We don't have a linked ID for you..
+            {% else %}
+            We think you're have a linked ID '{{request.linkedId}}'.
+            {% endif %}
+        </div>
+    </div>
   <div class="row">
       <div class="col-md-12" id="waiting">There are currently a total of
           <span id="connected_players">0</span> out of <span id="total_players">0</span>

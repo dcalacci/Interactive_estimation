@@ -2,7 +2,7 @@ import logging
 from random import choice
 
 from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -27,19 +27,28 @@ def new_interactive_game(game_settings, user):
 
 def assign(request):
     if request.method == 'POST':
+        print("in post!")
         return redirect('interactive:lobby')
+    return render(request, 'pages/home2.html')
+
+def assign_with_group(request, group_id="", linked_id=""):
+    redirect_url = reverse("interactive:lobby_group", kwargs={'group_id': group_id, 'linked_id': linked_id})
+    if request.method == 'POST':
+        print("in post:", redirect_url)
+        return redirect(redirect_url)
     return render(request, 'pages/home2.html')
 
 
 # Create your views here.
-def lobby(request, group_id=""):
+def lobby(request, group_id="", linked_id=""):
     if request.user.is_anonymous:
-        u, password = random_user('i')
+        u, password = random_user('i', linked_id=linked_id)
         u = authenticate(username=u.username, password=password)
         login(request, u)
     else:
         u = request.user
         request.groupId = group_id
+        request.linkedId = u.linked_id
         if u.game_type != 'i':
             return redirect('/')
 
