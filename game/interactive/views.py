@@ -44,6 +44,8 @@ def lobby(request, group_id="", linked_id=""):
     if request.user.is_anonymous:
         u, password = random_user('i', linked_id=linked_id)
         u = authenticate(username=u.username, password=password)
+        request.groupId = group_id
+        request.linkedId = u.linked_id
         login(request, u)
     else:
         u = request.user
