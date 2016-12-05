@@ -18,7 +18,8 @@ var gulp = require('gulp'),
       imagemin = require('gulp-imagemin'),
       exec = require('gulp-exec'),
       runSequence = require('run-sequence'),
-      browserSync = require('browser-sync');
+      browserSync = require('browser-sync'),
+      browserify = require('gulp-browserify');
 
 
 // Relative paths function
@@ -33,6 +34,7 @@ var pathsConfig = function (appName) {
     fonts: this.app + '/static/fonts',
     images: this.app + '/static/images',
     js: this.app + '/static/js',
+    rtcjs: this.app + '/static/rtcjs',
   }
 };
 
@@ -64,6 +66,13 @@ gulp.task('scripts', function() {
     .pipe(gulp.dest(paths.js));
 });
 
+gulp.task('browserify', function () {
+
+  return gulp.src(paths.rtcjs + '/main.js')
+    .pipe(browserify())
+    .pipe(gulp.dest(paths.js))
+})
+
 // Image compression
 gulp.task('imgCompression', function(){
   return gulp.src(paths.images + '/*')
@@ -89,7 +98,7 @@ gulp.task('browserSync', function() {
 
 // Default task
 gulp.task('default', function() {
-    runSequence(['styles', 'scripts', 'imgCompression'], 'runServer', 'browserSync');
+  runSequence(['styles', 'scripts', 'browserify', 'imgCompression'], 'runServer', 'browserSync');
 });
 
 ////////////////////////////////

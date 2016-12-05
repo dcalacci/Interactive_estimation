@@ -33,9 +33,9 @@ function new_unfollow_list(name, avatar, score) {
   return (`
     <img src=${avatar} class='avatar' />
     <span>Score: ${score}</span><img id="coin" src="/static/images/coin.png" />
-    <button type="button" id=${name} class="btn btn-primary unfollow">Unfollow</button>
   `);
 }
+
 //slider
 $("#slider").slider({
   min: 0,
