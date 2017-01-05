@@ -19,7 +19,9 @@ var gulp = require('gulp'),
       exec = require('gulp-exec'),
       runSequence = require('run-sequence'),
       browserSync = require('browser-sync'),
-      browserify = require('gulp-browserify');
+      envify = require('gulp-envify'),
+      browserify = require('gulp-browserify'),
+      env = require('gulp-env');
 
 
 // Relative paths function
@@ -67,9 +69,9 @@ gulp.task('scripts', function() {
 });
 
 gulp.task('browserify', function () {
-
   return gulp.src(paths.rtcjs + '/main.js')
     .pipe(browserify())
+    .pipe(envify())
     .pipe(gulp.dest(paths.js))
 })
 
@@ -100,6 +102,11 @@ gulp.task('browserSync', function() {
 gulp.task('default', function() {
   runSequence(['styles', 'scripts', 'browserify', 'imgCompression'], 'runServer', 'browserSync');
 });
+
+// Default task
+gulp.task('build', function() {
+  runSequence(['styles', 'scripts', 'browserify', 'imgCompression']);
+})
 
 ////////////////////////////////
 		//Watch//

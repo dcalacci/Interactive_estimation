@@ -24,17 +24,18 @@ def new_interactive_game(game_settings, user):
     user.save()
     return i
 
-
 def assign(request):
+    """Will attempt to redirect a user to the lobby or render the home page. This
+    is called if there's no sent group ID or user ID with the request.
+    """
     if request.method == 'POST':
-        print("in post!")
         return redirect('interactive:lobby')
     return render(request, 'pages/home2.html')
 
 def assign_with_group(request, group_id="", linked_id=""):
+    print("assign with group", group_id, linked_id)
     redirect_url = reverse("interactive:lobby_group", kwargs={'group_id': group_id, 'linked_id': linked_id})
     if request.method == 'POST':
-        print("in post:", redirect_url)
         return redirect(redirect_url)
     return render(request, 'pages/home2.html')
 
