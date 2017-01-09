@@ -13,6 +13,16 @@ services:
     environment:
       - POSTGRES_USER=game
 
+  nginx:
+    build:
+      context: ./compose/nginx
+      dockerfile: ./Dockerfile
+    links:
+      - django:django
+      - rtc:rtc
+    ports:
+      - "80:80"
+
   django:
     build:
       context: .
@@ -31,8 +41,6 @@ services:
       - postgres
       - redis
 
-
-
   pycharm:
     build:
       context: .
@@ -46,10 +54,21 @@ services:
     links:
       - postgres
 
-
-
   redis:
     image: redis:latest
+
+  rtc:
+    build:
+      context: .
+      dockerfile: ./compose/rtc/Dockerfile-dev
+    environment:
+      - TWILIO_ID=AC1781e09fec3ca1e81f9b63378fdfbf91
+      - TWILIO_TOKEN=0a59ac90bc1cfbb271cdaa8884cf4301
+      - PORT=8083
+    volumes:
+      - ./rtc:/rtc
+    ports:
+      - "8083:8083"
 
 
 

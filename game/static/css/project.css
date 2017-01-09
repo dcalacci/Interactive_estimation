@@ -1,143 +1,25 @@
-/* These styles are generated from project.scss. */
-
 .alert-debug {
-  color: black;
-  background-color: white;
+  background-color: #fff;
   border-color: #d6e9c6;
-}
+  color: #000; }
 
 .alert-error {
-  color: #b94a48;
   background-color: #f2dede;
   border-color: #eed3d7;
-}
+  color: #b94a48; }
 
-/* This is a fix for the bootstrap4 alpha release */
+.navbar {
+  border-radius: 0px; }
+
 @media (max-width: 47.9em) {
   .navbar-nav .nav-item {
-    float: none;
-    width: 100%;
     display: inline-block;
-  }
-
+    float: none;
+    width: 100%; }
   .navbar-nav .nav-item + .nav-item {
-    margin-left: 0;
-  }
-
+    margin-left: 0; }
   .nav.navbar-nav.pull-xs-right {
-    float: none !important;
-  }
-}
+    float: none !important; } }
 
-/* Display django-debug-toolbar.
-   See https://github.com/django-debug-toolbar/django-debug-toolbar/issues/742
-   and https://github.com/pydanny/cookiecutter-django/issues/317
-*/
 [hidden][style="display: block;"] {
-  display: block !important;
-}
-
-* {
-  margin: 0;
-}
-
-html, body {
-  font-size: 18px;
-  height: 100%;
-}
-
-.header {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-.logout {
-  display: inline-block;
-  float: right;
-}
-
-.survey {
-  width: 60%;
-  margin: auto;
-}
-
-.slider {
-  width: 50%;
-}
-
-.nextButton {
-  float: right;
-}
-
-#logo {
-  height: 50px;
-}
-
-.wrapper {
-  min-height: 100%;
-  margin: 0 auto -20px; /* the bottom margin is the negative value of the footer's height */
-}
-
-.footer, .push {
-  position: relative;
-  height: 20px; /* .push must be the same height as .footer */
-}
-
-.footer {
-  background-color: #f5f5f5;
-  font-size: 12px;
-  width: 100%;
-}
-
-.example {
-  width: 40%;
-}
-
-.sample {
-  width: 500px;
-}
-#myModal {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-}
-
-.toolTip {
-  z-index: 2;
-}
-
-.loading {
-  width: 50px;
-  margin: auto;
-  display: block;
-}
-
-.overview {
-  width: 60%;
-  margin: auto;
-}
-.tooltip {
-  color: red #important;
-}
-
-#sampleSlider {
-  width: 280px;
-}
-
-.submitButton {
-  margin-left: 200px;
-}
-<<<<<<< HEAD
-blockquote.instr {
-    font-size: 16px;
-=======
-#age {
-  width: 100px;
-}
-
-.gender {
-  margin-left: 20px;
->>>>>>> bfb49ebec0260de6b46a3131e33ce1f6243e94ed
-}
+  display: block !important; }

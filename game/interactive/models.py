@@ -23,9 +23,9 @@ class Settings(models.Model):
     max_following = models.PositiveSmallIntegerField()
     min_following = models.PositiveSmallIntegerField()
 
-    score_lambda = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+    score_lambda = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)], default=1)
 
-    max_rounds = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+    max_rounds = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)], default=5)
 
     def __str__(self):
         return "Settings: users({},{}), following({},{})".format(self.min_users, self.max_users,

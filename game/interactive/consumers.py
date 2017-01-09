@@ -106,7 +106,10 @@ def lobby(message):
     group_id = None if group_id == 'null' else group_id
 
     try:
-        game_settings = Settings.objects.order_by('?')[0]
+        if (len(Settings.objects.order_by('?')) > 0):
+            game_settings = Settings.objects.order_by('?')[0]
+        else:
+            game_settings, _ = Settings.objects.get_or_create(max_users=5, min_users=0, max_following=2, min_following=0)
     except Settings.DoesNotExist:
         game_settings, _ = Settings.objects.get_or_create(max_users=5, min_users=0, max_following=2, min_following=0)
 

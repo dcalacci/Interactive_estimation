@@ -33,6 +33,7 @@ var $scope = {
 }
 
 function callEverybodyElse (roomName, userList, selfInfo) {
+  console.log("calling other users, info:", roomName, userList, selfInfo)
   if ($scope.needToCallOtherUsers) {
     console.log('need to call other users:', userList)
     _.forEach(userList, (user) => {
@@ -53,7 +54,7 @@ function callEverybodyElse (roomName, userList, selfInfo) {
 }
 
 function loginSuccess () {
-  console.log('login successful')
+  console.log('Connect to EasyRTC Server')
   $scope.roomUsers.push({participant: easyrtc.myEasyrtcid, meeting: $scope.roomName})
   console.log($scope.roomUsers)
   app.authenticate({
@@ -82,33 +83,46 @@ function loginSuccess () {
   })
 }
 
+function loginFailure (errorCode, errorText) {
+  console.log("couldn't log into server:", errorCode, errorText);
+}
+
 function getIdOfBox (boxNum) {
   return '#box' + boxNum
 }
 
 function init () {
   console.log('initializing RTC client...')
+  //easyrtc.setSocketUrl("ws://rhythm-rtc-dev.herokuapp.com:80")
+  //easyrtc.setSocketUrl(":8083")
   easyrtc.dontAddCloseButtons()
+
   easyrtc.setRoomEntryListener(function (entry, roomName) {
     console.log('entered room!')
     $scope.needToCallOtherUsers = true
   })
+
   easyrtc.setRoomOccupantListener(callEverybodyElse)
+
+  joinRoom()
+
   easyrtc.easyApp('rhythm.party',
                   'box0',
                   ['box1', 'box2', 'box3', 'box4'],
-                  loginSuccess)
-  joinRoom()
+                  loginSuccess,
+                  loginFailure)
+
   easyrtc.setDisconnectListener(function () {
     easyrtc.showError('LOST-CONNECTION', 'Lost connection to signaling server')
   })
+
   easyrtc.setOnCall(function (easyrtcid, slot) {
     console.log('getConnection count=' + easyrtc.getConnectionCount())
     $scope.roomUsers.push({participant: easyrtcid, meeting: $scope.roomName})
     $(getIdOfBox(slot + 1)).css('display', 'unset')
     screenLogic()
-    viz.updateMM()
   })
+
   easyrtc.setOnHangup(function (easyrtcid, slot) {
     setTimeout(function () {
       $(getIdOfBox(slot + 1)).css('display', 'none')
@@ -130,7 +144,7 @@ function joinRoom () {
   if ($scope.roomName === null || $scope.roomName === '' || $scope.roomName === 'null') {
     console.log("No group ID / Room name, doing nothing...")
   } else {
-    easyrtc.joinRoom($scope.roomName)
+    easyrtc.joinRoom($scope.roomName, {}, function (e) { console.log("success"); }, function (e) { console.log('failure'); })
     console.log('entered room: ' + $scope.roomName)
 //    $('#roomIndicator').html("Currently in room '" + $scope.roomName + "'")
   }
