@@ -92,7 +92,7 @@ def send_user_avatar(game, user):
 
 
 def send_game_status(game):
-    game.broadcast(action='info', connected_players=game.users.count(), total_players=game.constraints.max_users)
+    game.broadcast(action='info', connected_players=game.users.count(), total_players=game.constraints.max_users, game_id=game.id)
 
 
 @channel_session_user_from_http
@@ -132,6 +132,7 @@ def lobby(message):
         # todo: connect him to the game
         # check if the game has ended then ??
         #
+        print("user was already assigned to a game!", game)
         if game.end_time is None:
             # game is still in progress
             game.group_channel.add(message.reply_channel)
@@ -162,6 +163,7 @@ def lobby(message):
     games = Interactive.objects.filter(started=False, group=group_id).annotate(num_of_users=Count('users')).order_by('-num_of_users')
 
     if games:
+        print("found more than one game!", games)
         for game in games:
             if game.users.count() < game.constraints.max_users:
                 used_avatars = {i.avatar for i in game.users.all()}
@@ -173,6 +175,7 @@ def lobby(message):
             logging.error("User couldn't be assigned to a game")
             return
     else:
+        print("creating a new game.")
         game = Interactive.objects.create(constraints=game_settings, group=group_id)
         game.users.add(user)
         user.avatar = avatar()
@@ -188,10 +191,12 @@ def lobby(message):
 
     # TODO: add time to the condition
     if waiting_for == 0:
+        print("not waiting for any more players! starting game.")
         game.started = True
         game.save()
         start_initial(game)
     else:
+        print("waiting for more players, sending status.")
         send_game_status(game)
     return
 
@@ -333,6 +338,37 @@ def interactive_submit(message):
                 })
             })
 
+@channel_session_user
+def start_submit(message):
+    user = message.user
+
+    if not user.is_authenticated:
+        return redirect('/')
+
+    print("not waiting for any more players! starting game.")
+    game_id = message.get('gameId')
+    print("trying to start game with game id:", game_id)
+
+    try:
+        with transaction.atomic():
+            if game_id:
+                game = Interactive.objects.get(
+                    Q(id=game_id),
+                    Q(users=user)
+                )
+            else:
+                game = Interactive.objects.get(users=user)
+    except Interactive.DoesNotExist:
+        game = None
+
+    if game.end_time is None:
+        game.started = True
+        game.save()
+        start_initial(game)
+    else:
+        # todo: logout then try to to connect him/ again
+        game.broadcast(error=True, msg='The has ended please login back again')
+        pass
 
 @channel_session_user
 def round_outcome(message):
@@ -387,8 +423,12 @@ def game_state_checker(game, state, round_data, counter=0):
 
 
 def start_initial(game):
+    """ starts the initial game / round, caches state.
+    """
     round_data = get_round(game)
     state = 'initial'
+
+    print("starting initial game!")
 
     if round_data is None:
         game.end_time = timezone.now()

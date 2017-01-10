@@ -84,7 +84,6 @@ function start_game(data, seconds) {
 
   var audio = new Audio('/static/round-sound.mp3');
   audio.play();
-
 }
 
 function start_interactive(data) {
@@ -107,8 +106,9 @@ function start_interactive(data) {
 }
 
 
-$(function () {
 
+$(function () {
+  var gameId = "";
   var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
   var ws_path = ws_scheme + '://' + window.location.host + "/multiplayer/lobby/" + groupId;
 
@@ -129,10 +129,16 @@ $(function () {
     console.log("Disconnected from chat socket");
   };
 
+  $(document).on("click", "#startButton", function(e) {
+    socket.send(JSON.stringify({
+      action: 'start_interactive',
+      gameId: gameId
+    }));
+  });
+
   socket.onmessage = function (msg) {
     // console.log(msg.data);
     var data = JSON.parse(msg.data);
-
     if(data.error){
       console.log(data.msg);
       return;
@@ -140,6 +146,7 @@ $(function () {
 
     if(data.action == "info"){
       document.querySelector('#connected_players').innerHTML = data.connected_players || 0;
+      gameId = data.game_id;
       //document.querySelector('#total_players').innerHTML = data.total_players || 0;
     }
     else if(data.action == "redirect"){
@@ -147,7 +154,7 @@ $(function () {
       window.location.href = proto + window.location.host + data.url;
     }
     else if(data.action == 'avatar'){
-      $('#user-avatar').attr('src', data.url);
+      $('.user-avatar').attr('src', data.url);
     }
     else if(data.action == 'initial'){
       start_game(data, data.seconds);

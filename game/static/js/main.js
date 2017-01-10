@@ -536,6 +536,7 @@ function init () {
   easyrtc.setOnHangup(function (easyrtcid, slot) {
     setTimeout(function () {
       $(getIdOfBox(slot + 1)).css('display', 'none')
+      $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'block')
       screenLogic()
     }, 20)
     // need to update viz here and remove participant
