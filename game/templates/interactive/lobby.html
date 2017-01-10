@@ -13,17 +13,46 @@
 {% endblock %}
 
 {% block container %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>
 
-<div id="lobby">
-    <div class="row">
-        <div class="col-md-12">
+<div id="lobby" class="container">
+    <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-12 text-center">
+            <h2 class="text-center"> You're in the assignment lobby! </h2>
             {% if not request.groupId %}
-            You're not in a pre-defined group, so you'll join the next available open group of students.
+            <p> We're waiting on a few more people to join the lobby.</p>
             {% else %}
-            We think you're in a pre-defined group with ID '{{request.groupId}}', so we'll wait to start the assignment until all five of you are here.
-            {% endif %}
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h3> We're waiting on the rest of your group to join the lobby before you start the assignment. </h3>
+            <p> As group members join the lobby, you should be able to chat with
+                them over videoconference below. When you all agree that the group is
+                ready to start the assignment, one of you should click "start
+                assignment" below to begin!</p>
+            <p> Make sure that your video and audio work by looking at the box
+            on the right. The page should ask for access to your camera, and you
+            should see a green outline around the video feed when you speak. Try
+            it out!</p>
+        </div>
+        <div class="col-md-6">
+            <p class="text-center">
+                This is how you will look to other students!
+            </p>
+            <video id="userBox" class="responsive-video" muted volume="0" width="237" height="180"></video>
+            <div id="videoHolder">
+                <p class="text-center" id="videoHolderText">
+                    Enable your webcam!
+                </p>
+            </div>
+            
+        </div>
+    </div>
+    {% endif %}
+
+    {%include 'components/video.html' %}
+
     <div class="row">
         <div class="col-md-12">
             {% if not request.linkedId %}
@@ -34,14 +63,12 @@
         </div>
     </div>
   <div class="row">
-      <div class="col-md-12" id="waiting">There are currently a total of
-          <span id="connected_players">0</span> out of <span id="total_players">0</span>
-          required participants waiting for the game to start.</div>
+      <div class="col-md-12" id="waiting">
+          There are currently <span id="connected_players">0</span> group
+          members in the lobby. We think you're in group '{{request.groupId}}'.
   </div>
-  <p>Please wait a few moments while we try to find the needed participants.</p>
-  <p>If we can't find enough participants within {{lobbyTimeout}} minutes, we will end the HIT and pay you for your time.</p>
-  <h>Please make sure your sound is on as a bell will ring to indicate the start of a new game.</h>
-  {%include 'components/video.html' %} 
+  
+  </div>
 </div>
 
 <div id="game" hidden>

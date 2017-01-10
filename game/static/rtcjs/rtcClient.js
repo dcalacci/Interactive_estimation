@@ -55,6 +55,7 @@ function callEverybodyElse (roomName, userList, selfInfo) {
 
 function loginSuccess () {
   console.log('Connect to EasyRTC Server')
+  $('#videoHolder').css('display', 'none');
   $scope.roomUsers.push({participant: easyrtc.myEasyrtcid, meeting: $scope.roomName})
   console.log($scope.roomUsers)
   app.authenticate({
@@ -94,7 +95,7 @@ function getIdOfBox (boxNum) {
 function init () {
   console.log('initializing RTC client...')
   //easyrtc.setSocketUrl("ws://rhythm-rtc-dev.herokuapp.com:80")
-  //easyrtc.setSocketUrl(":8083")
+  easyrtc.setSocketUrl(":8083")
   easyrtc.dontAddCloseButtons()
 
   easyrtc.setRoomEntryListener(function (entry, roomName) {
@@ -107,7 +108,7 @@ function init () {
   joinRoom()
 
   easyrtc.easyApp('rhythm.party',
-                  'box0',
+                  'userBox',
                   ['box1', 'box2', 'box3', 'box4'],
                   loginSuccess,
                   loginFailure)
@@ -119,6 +120,9 @@ function init () {
   easyrtc.setOnCall(function (easyrtcid, slot) {
     console.log('getConnection count=' + easyrtc.getConnectionCount())
     $scope.roomUsers.push({participant: easyrtcid, meeting: $scope.roomName})
+    //    console.log($(getIdOfBox(slot + 1) + "_container"))
+    $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'none')
+    //$(getIdOfBox(slot + 1) + "_container").css('display', 'unset')
     $(getIdOfBox(slot + 1)).css('display', 'unset')
     screenLogic()
   })
@@ -126,6 +130,7 @@ function init () {
   easyrtc.setOnHangup(function (easyrtcid, slot) {
     setTimeout(function () {
       $(getIdOfBox(slot + 1)).css('display', 'none')
+      $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'block')
       screenLogic()
     }, 20)
     // need to update viz here and remove participant

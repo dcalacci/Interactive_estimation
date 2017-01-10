@@ -1,6 +1,6 @@
 /* global clm pModel Stats requestAnimFrame*/
 function trackFace () {
-  var vid = document.getElementById('box0')
+  var vid = document.getElementById('userBox')o
   var overlay = document.getElementById('overlay')
   var overlayCC = overlay.getContext('2d')
 

@@ -6,7 +6,7 @@ function processAudio (scope) {
   console.log('preparing to process audio....')
   var speakingEvents = new Sibilant(easyrtc.getLocalStream(), {passThrough: false})
   speakingEvents.bind('speaking', function () {
-    document.querySelector('#box0').style.border = '5px solid #27ae60'
+    document.querySelector('#userBox').style.border = '5px solid #27ae60'
     console.log('speaking!')
   })
 
@@ -29,7 +29,7 @@ function processAudio (scope) {
       }).catch(function (err) {
         console.log('ERROR:', err)
       })
-    document.querySelector('#box0').style.border = '5px solid #555'
+    document.querySelector('#userBox').style.border = '5px solid #555'
   })
 }
 module.exports = {
@@ -461,6 +461,7 @@ function callEverybodyElse (roomName, userList, selfInfo) {
 
 function loginSuccess () {
   console.log('Connect to EasyRTC Server')
+  $('#videoHolder').css('display', 'none');
   $scope.roomUsers.push({participant: easyrtc.myEasyrtcid, meeting: $scope.roomName})
   console.log($scope.roomUsers)
   app.authenticate({
@@ -500,7 +501,7 @@ function getIdOfBox (boxNum) {
 function init () {
   console.log('initializing RTC client...')
   //easyrtc.setSocketUrl("ws://rhythm-rtc-dev.herokuapp.com:80")
-  //easyrtc.setSocketUrl(":8083")
+  easyrtc.setSocketUrl(":8083")
   easyrtc.dontAddCloseButtons()
 
   easyrtc.setRoomEntryListener(function (entry, roomName) {
@@ -513,7 +514,7 @@ function init () {
   joinRoom()
 
   easyrtc.easyApp('rhythm.party',
-                  'box0',
+                  'userBox',
                   ['box1', 'box2', 'box3', 'box4'],
                   loginSuccess,
                   loginFailure)
@@ -525,6 +526,9 @@ function init () {
   easyrtc.setOnCall(function (easyrtcid, slot) {
     console.log('getConnection count=' + easyrtc.getConnectionCount())
     $scope.roomUsers.push({participant: easyrtcid, meeting: $scope.roomName})
+    //    console.log($(getIdOfBox(slot + 1) + "_container"))
+    $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'none')
+    //$(getIdOfBox(slot + 1) + "_container").css('display', 'unset')
     $(getIdOfBox(slot + 1)).css('display', 'unset')
     screenLogic()
   })

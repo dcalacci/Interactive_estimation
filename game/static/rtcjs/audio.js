@@ -5,7 +5,7 @@ function processAudio (scope) {
   console.log('preparing to process audio....')
   var speakingEvents = new Sibilant(easyrtc.getLocalStream(), {passThrough: false})
   speakingEvents.bind('speaking', function () {
-    document.querySelector('#box0').style.border = '5px solid #27ae60'
+    document.querySelector('#userBox').style.border = '5px solid #27ae60'
     console.log('speaking!')
   })
 
@@ -28,7 +28,7 @@ function processAudio (scope) {
       }).catch(function (err) {
         console.log('ERROR:', err)
       })
-    document.querySelector('#box0').style.border = '5px solid #555'
+    document.querySelector('#userBox').style.border = '5px solid #555'
   })
 }
 module.exports = {

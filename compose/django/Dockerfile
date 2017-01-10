@@ -29,4 +29,6 @@ RUN sed -i 's/\r//' /entrypoint.sh \
 
 WORKDIR /app
 
+run gulp build
+
 ENTRYPOINT ["/entrypoint.sh"]
