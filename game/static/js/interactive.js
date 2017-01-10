@@ -75,6 +75,7 @@ function start_game(data, seconds) {
   state = data.action;
   $("#myModal").modal('hide');
   $("#lobby").hide();
+  $("#lobbyInfo").hide();
   set_breadcrumbs(state, data.current_round);
   $("#game").show();
 
@@ -158,6 +159,7 @@ $(function () {
     }
     else if(data.action == 'initial'){
       start_game(data, data.seconds);
+      $("#videoContainer").hide();
       resetSlider();
 
       $(".guess").show();
@@ -178,6 +180,7 @@ $(function () {
 
       $("#interactiveGuess").show();
       $(".box#score").html(`${data.score}`);
+      $("#videoContainer").show();
 
       // data.following = [{"username":"Test", "avatar":"cow.png", "score": 1.0}]
       $("#following_list tbody").html("");
