@@ -76,6 +76,7 @@ function start_game(data, seconds) {
   $("#myModal").modal('hide');
   $("#lobby").hide();
   $("#lobbyInfo").hide();
+  $("#startButtonRow").hide();
   set_breadcrumbs(state, data.current_round);
   $("#game").show();
 
@@ -169,7 +170,6 @@ $(function () {
         var audio = new Audio('/static/bell.mp3');
         audio.play();
       }
-
     }
     else if(data.action == 'ping'){
       console.log(data.text)
