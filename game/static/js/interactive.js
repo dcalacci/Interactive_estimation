@@ -94,23 +94,47 @@ function new_unfollow_list(name, avatar, score) {
 
 
 // gets the id of the DOM element ofthe video box for user object `user`
-var getVideoBoxId = function (user) {
+var getVideoBoxId = function (linkedId) {
   var linkedIdMap = _.invert(window.$scope.easyRtcIdMap)
     try {
-      var easyRtcId = linkedIdMap[user.linkedId]
+      var easyRtcId = linkedIdMap[linkedId]
       var boxId = window.$scope.userBoxMap[easyRtcId]
-      return "box" + boxId + "_container"
+      return "#box" + boxId + "_container"
     } catch(err) {
       console.log("couldnt get easyRtcId mapping:", err)
     }
+}
+
+var updateGuess = function (linkedId, guess) {
+  var containerId = getVideoBoxId(linkedId)
+  var guessDom = $(containerId).children('.guess')
+  guessDom.html(`${guess}`)
+}
+
+// updates the score label for each user in `users`
+// players is a list of user objects
+var updateGuesses = function (users) {
+  console.log("going to update score for users")
+  _.each(users, function (user) {
+    updateGuess(user.linkedId, user.guess)
+  })
+}
+
+var updateScore = function (linkedId, score) {
+  var containerId = getVideoBoxId(linkedId)
+  var scoreDom = $(containerId).children('.score')
+  console.log("Setting score on element:", scoreDom)
+  scoreDom.html(`${score}`)
 }
 
 // updates the score label for each user in `users`
 // players is a list of user objects
 var updateScores = function (users) {
   console.log("going to update score for users")
+  _.each(users, function (user) {
+    updateScore(user.linkedId, user.score)
+  })
 }
-
 
 function start_interactive(data) {
 
@@ -210,18 +234,19 @@ $(function () {
 
       // need to get the box ID from the player linked ID or username
       // then change the content of the dom in the `interactiveGuess` div under that box.
-      console.log("allplayers:", data.allPlayers)
-      $.each(data.allPlayers, function(i, user) {
-        if (user.guess < 0) {
-          user.guess = '';
-        }
 
-        if (user.linkedId !== window.$scope.thisUser.linkedId) {
-          var vBoxId = getVideoBoxId(user)
-          // this updates also for our user; we should fix that.
-          console.log("going to update score for user ", user.linkedId, "on boxId", vBoxId)
-        }
+      var otherPlayers = _.filter(data.allPlayers, function (u) {
+        return u.linkedId === window.$scope.thisUser.linkedId
       })
+
+      otherPlayers = _.map(otherPlayers, function (u) {
+        var userGuess = u.guess < 0 ? '' : u.guess
+        return _.extend(u, {guess: userGuess})
+      })
+
+      // conditional for scores...
+      updateGuesses(otherPlayers)
+      updateScores(otherPlayers)
 
       // // data.following = [{"username":"Test", "avatar":"cow.png", "score": 1.0}]
       // $("#following_list tbody").html("");
@@ -296,12 +321,15 @@ $(function () {
       });
 
     }
+
     else if(data.action == 'sliderChange'){
+      updateGuess(data.linkedId, data.slider)
       // this (maybe?) updates also for our user; we should fix that.
-      var vBoxId = getVideoBoxId(data.username)
-      console.log("going to update score for user ", data.linkedId, "on boxId", vBoxId)
-      $(`#${data.username} > span`).html(data.slider);
+      // var vBoxId = getVideoBoxId(data.linkedId)
+      // console.log("going to update score for user ", data.linkedId, "on boxId", vBoxId)
+      // $(`#${data.username} > span`).html(data.slider);
     }
+
     else if(data.action == 'followNotify'){
       following = data.following.map(function(user) {
         return user.username;
