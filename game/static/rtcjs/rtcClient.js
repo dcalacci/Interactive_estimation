@@ -30,7 +30,8 @@ window.$scope = {
   app: app,
   screenSize: 0,
   userBoxMap: {}, // easyrtcid -> box number
-  easyRtcIdMap: {} // easyrtcid -> linkedId
+  easyRtcIdMap: {}, // easyrtcid -> linkedId
+  thisUser: ""
 }
 
 var setEasyRtcMapping = function (easyRtcId, linkedId) {
@@ -66,6 +67,10 @@ var updateLocalEasyRtcMap = function (senderId, msgData) {
 // and the easyRTCIds.
 var setAndSendLinkedId = function (roomName, selfInfo, linkedId) {
   console.log("sending linked ID:", selfInfo.easyrtcid, linkedId, "to", roomName)
+  window.$scope.thisUser = {
+    easyrtcid: selfInfo.easyrtcid,
+    linkedId: linkedId
+  }
   easyrtc.sendDataWS({targetRoom: roomName}, 'linkedId',
                      {easyRtcId: selfInfo.easyrtcid,
                       linkedId: linkedId})
@@ -166,7 +171,12 @@ function init () {
   })
 
   var updateUserBoxMap = function (easyrtcid, slot) {
+    console.log("associating box", slot, "with id", easyrtcid)
     window.$scope.userBoxMap[easyrtcid] = slot
+  }
+
+  var removeUserBoxMap = function (easyrtcid) {
+    window.$scope.userBoxMap = _.omit(window.$scope.userBoxMap, easyrtcid)
   }
 
   easyrtc.setOnCall(function (easyrtcid, slot) {
@@ -182,9 +192,9 @@ function init () {
 
   easyrtc.setOnHangup(function (easyrtcid, slot) {
     setTimeout(function () {
-      updateUserBoxMap(easyrtcid, slot)
+      //updateUserBoxMap(easyrtcid, slot)
       $(getIdOfBox(slot + 1)).css('display', 'none')
-      window.$scope.userBoxMap[easyrtcid] = slot + 1
+      removeUserBoxMap(easyrtcid)
       $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'block')
       screenLogic()
     }, 20)

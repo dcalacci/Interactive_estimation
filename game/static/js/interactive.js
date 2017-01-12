@@ -95,14 +95,14 @@ function new_unfollow_list(name, avatar, score) {
 
 // gets the id of the DOM element ofthe video box for user object `user`
 var getVideoBoxId = function (user) {
-  try {
-    var easyRtcId = _.invert(window.$scope.easyRtcIdMap)[user.linkedId]
-    var boxId = window.$scope.userBoxMap[easyRtcId]
-    return "box" + boxId + "_container"
-  } catch(err) {
-    console.log("couldnt get easyRtcId mapping:", err)
-  }
-
+  var linkedIdMap = _.invert(window.$scope.easyRtcIdMap)
+    try {
+      var easyRtcId = linkedIdMap[user.linkedId]
+      var boxId = window.$scope.userBoxMap[easyRtcId]
+      return "box" + boxId + "_container"
+    } catch(err) {
+      console.log("couldnt get easyRtcId mapping:", err)
+    }
 }
 
 // updates the score label for each user in `users`
@@ -215,9 +215,12 @@ $(function () {
         if (user.guess < 0) {
           user.guess = '';
         }
-        var vBoxId = getVideoBoxId(user)
-        // this updates also for our user; we should fix that.
-        console.log("going to update score for user ", user.linkedId, "on boxId", vBoxId)
+
+        if (user.linkedId !== window.$scope.thisUser.linkedId) {
+          var vBoxId = getVideoBoxId(user)
+          // this updates also for our user; we should fix that.
+          console.log("going to update score for user ", user.linkedId, "on boxId", vBoxId)
+        }
       })
 
       // // data.following = [{"username":"Test", "avatar":"cow.png", "score": 1.0}]
@@ -295,8 +298,8 @@ $(function () {
     }
     else if(data.action == 'sliderChange'){
       // this (maybe?) updates also for our user; we should fix that.
-      console.log("going to update score for user ", data.linkedId, "on boxId", vBoxId)
       var vBoxId = getVideoBoxId(data.username)
+      console.log("going to update score for user ", data.linkedId, "on boxId", vBoxId)
       $(`#${data.username} > span`).html(data.slider);
     }
     else if(data.action == 'followNotify'){
