@@ -18,23 +18,6 @@ function countdown(counterState, s) {
   tick();
 }
 
-function new_follow_list(name, avatar, score) {
-  $("#follow_list").append(`
-    <div class="user" id=${name}>
-      <a href="#" data-toggle="tooltip" data-placement="right" class="toolTip" title="Unfollow a user first">
-        <img src="/static/images/plus.ico" class="plusIcon" />
-      </a>
-      <img src=${avatar} class="avatar" /> <span class="userScore">score: ${score}</span><img id="coin" src="/static/images/coin.png" />
-    </div>
-  `);
-}
-
-function new_unfollow_list(name, avatar, score) {
-  return (`
-    <img src=${avatar} class='avatar' />
-    <span>Score: ${score}</span><img id="coin" src="/static/images/coin.png" />
-  `);
-}
 
 //slider
 $("#slider").slider({
@@ -87,6 +70,48 @@ function start_game(data, seconds) {
   var audio = new Audio('/static/round-sound.mp3');
   audio.play();
 }
+
+////////////////////////
+
+function new_follow_list(name, avatar, score) {
+  $("#follow_list").append(`
+    <div class="user" id=${name}>
+      <a href="#" data-toggle="tooltip" data-placement="right" class="toolTip" title="Unfollow a user first">
+        <img src="/static/images/plus.ico" class="plusIcon" />
+      </a>
+      <img src=${avatar} class="avatar" /> <span class="userScore">score: ${score}</span><img id="coin" src="/static/images/coin.png" />
+    </div>
+  `);
+}
+
+function new_unfollow_list(name, avatar, score) {
+  return (`
+    <img src=${avatar} class='avatar' />
+    <span>Score: ${score}</span><img id="coin" src="/static/images/coin.png" />
+  `);
+}
+
+
+
+// gets the id of the DOM element ofthe video box for user object `user`
+var getVideoBoxId = function (user) {
+  try {
+    var easyRtcId = _.invert(window.easyRtcIdMap)[user.linkedId]
+    var boxId = window.userBoxMap[easyRtcId]
+    var id = "box" + boxId + "_container"
+    console.log("going to update score for user ", user.linkedId, "on boxId", id)
+  } catch(err) {
+    console.log("couldnt get easyRtcId mapping:", err)
+  }
+
+}
+
+// updates the score label for each user in `users`
+// players is a list of user objects
+var updateScores = function (users) {
+  console.log("going to update score for users")
+}
+
 
 function start_interactive(data) {
 
@@ -176,11 +201,22 @@ $(function () {
     }
     else if(data.action == 'interactive'){
       start_game(data, data.seconds);
-      $(".guess").show();
+      $(".guess").show(); // show guess slider
 
-      $("#interactiveGuess").show();
+      // need here to do the equivalent -- "show" interactive guess and score
+      // values.
+      $(".interactiveGuess").show();
       $(".box#score").html(`${data.score}`);
       $("#videoContainer").show();
+
+      // need to get the box ID from the player linked ID or username
+      // then change the content of the dom in the `interactiveGuess` div under that box.
+      // $.each(data.allPlayers, function(i, user) {
+      //   if (user.guess < 0) {
+      //     user.guess = '';
+      //   }
+      //   $('#')
+      // })
 
       // data.following = [{"username":"Test", "avatar":"cow.png", "score": 1.0}]
       $("#following_list tbody").html("");
