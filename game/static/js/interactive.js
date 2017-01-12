@@ -108,6 +108,7 @@ var getVideoBoxId = function (linkedId) {
 var updateGuess = function (linkedId, guess) {
   var containerId = getVideoBoxId(linkedId)
   var guessDom = $(containerId).children('.guess')
+  console.log("Setting GUESS on element:", guessDom, "from containerId", containerId)
   guessDom.html(`${guess}`)
 }
 
@@ -123,7 +124,7 @@ var updateGuesses = function (users) {
 var updateScore = function (linkedId, score) {
   var containerId = getVideoBoxId(linkedId)
   var scoreDom = $(containerId).children('.score')
-  console.log("Setting score on element:", scoreDom)
+  console.log("Setting GUESS on element:", scoreDom, "from containerId", containerId)
   scoreDom.html(`${score}`)
 }
 

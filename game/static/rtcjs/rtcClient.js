@@ -182,7 +182,7 @@ function init () {
   easyrtc.setOnCall(function (easyrtcid, slot) {
     console.log('getConnection count=' + easyrtc.getConnectionCount())
     window.$scope.roomUsers.push({participant: easyrtcid, meeting: window.$scope.roomName})
-    updateUserBoxMap(easyrtcid, slot)
+    updateUserBoxMap(easyrtcid, slot + 1)
     //    console.log($(getIdOfBox(slot + 1) + "_container"))
     $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'none')
     //$(getIdOfBox(slot + 1) + "_container").css('display', 'unset')
