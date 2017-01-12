@@ -17,14 +17,14 @@ function processAudio (scope) {
         'startTime': data.start.toISOString(),
         'endTime': data.end.toISOString()
       }).then(function (res) {
-        console.log('speaking event recorded!', res)
+        //console.log('speaking event recorded!', res)
         var start = new Date(res['startTime'])
         var end = new Date(res['endTime'])
         function pad (n) {
           return String('00' + n).slice(-2)
         }
         var duration = end - start
-        console.log(end.getHours() + ':' + pad(end.getMinutes()) + ':' + pad(end.getSeconds()) + '- Duration: ' + duration + ' ms')
+        //console.log(end.getHours() + ':' + pad(end.getMinutes()) + ':' + pad(end.getSeconds()) + '- Duration: ' + duration + ' ms')
       }).catch(function (err) {
         console.log('ERROR:', err)
       })

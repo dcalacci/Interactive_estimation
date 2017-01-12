@@ -245,7 +245,11 @@ def data_broadcast(message):
 
             for user_round in rounds.all():
                 print('Going to send data to {}'.format(user_round.user.username))
-                game.user_send(user_round.user, action='sliderChange', username=user.username, slider=slider)
+                game.user_send(user_round.user,
+                               action='sliderChange',
+                               username=user.username,
+                               linkedId=user.linked_id,
+                               slider=slider)
     else:
         logging.error('Got invalid value for slider')
 
@@ -268,6 +272,7 @@ def follow_list(message):
         just_followed = []
         for u in game.users.all():
             d = {
+                    'linkedId': u.linked_id,
                     'username': u.username,
                     'avatar': u.get_avatar,
                     'score': u.get_score,
@@ -285,7 +290,7 @@ def follow_list(message):
         message.reply_channel.send({'text':json.dumps({
             'action': 'followNotify',
             'following': just_followed,
-            'all_players': u_can_follow,
+            'allPlayers': u_can_follow,
         })})
     else:
         message.reply_channel.send({'text': json.dumps({
@@ -471,10 +476,20 @@ def start_interactive(game, round_data):
 def interactive(user, game, round_data):
     current_round = InteractiveRound.objects.get(user=user, game=game, round_order=round_data.get('current_round'))
 
-    following = [{'username': u.username, 'avatar': u.get_avatar, 'guess': InteractiveRound.objects.get(user=u,
+    following = [{'linkedId': u.linked_id, 'username': u.username, 'avatar': u.get_avatar, 'guess': InteractiveRound.objects.get(user=u,
                     round_order=round_data.get('current_round')).get_guess()} for u in current_round.following.all()]
 
-    game.user_send(user, action='interactive', score=user.get_score, following=following, seconds=SECONDS, **round_data)
+    allPlayers = []
+    for u in game.users.all():
+        print("user:", u)
+        d = {
+            'username': u.username,
+            'linkedId': u.linked_id,
+            'avatar': u.get_avatar,
+            'score': u.get_score,
+        }
+        allPlayers.append(d)
+    game.user_send(user, action='interactive', score=user.get_score, following=following, seconds=SECONDS, allPlayers=allPlayers, **round_data)
 
 
 def start_outcome(game, round_data):
@@ -489,7 +504,7 @@ def start_outcome(game, round_data):
 def outcome_loop(lim, l):
     temp = []
     for u in l:
-        d = {'username': u.username, 'avatar': u.get_avatar}
+        d = {'username': u.username, 'avatar': u.get_avatar, 'linkedId': u.linked_id}
         rounds = InteractiveRound.objects.filter(user=u).order_by('-round_order')[:lim]
         score = calculate_score(rounds.all())
         d['score'] = score
@@ -506,6 +521,6 @@ def outcome(user, game: Interactive, round_data):
     currently_following = outcome_loop(game.constraints.score_lambda, current_round.following.all())
 
     game.user_send(user, action='outcome', guess=float(current_round.get_influenced_guess()),
-                   score=user.get_score, following=currently_following, all_players=rest_of_users,
+                   score=user.get_score, following=currently_following, allPlayers=rest_of_users,
                    max_following=game.constraints.max_following, correct_answer=float(current_round.plot.answer),
                    seconds=SECONDS, **round_data)

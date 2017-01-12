@@ -167,12 +167,12 @@ function init () {
 
   var updateUserBoxMap = function (easyrtcid, slot) {
     window.$scope.userBoxMap[easyrtcid] = slot
-    window.$scope.boxUserMap[slot + 1] = easyrtcid + 1
   }
 
   easyrtc.setOnCall(function (easyrtcid, slot) {
     console.log('getConnection count=' + easyrtc.getConnectionCount())
     window.$scope.roomUsers.push({participant: easyrtcid, meeting: window.$scope.roomName})
+    updateUserBoxMap(easyrtcid, slot)
     //    console.log($(getIdOfBox(slot + 1) + "_container"))
     $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'none')
     //$(getIdOfBox(slot + 1) + "_container").css('display', 'unset')
@@ -182,7 +182,7 @@ function init () {
 
   easyrtc.setOnHangup(function (easyrtcid, slot) {
     setTimeout(function () {
-//      updateUserBoxMap(easyrtcid, slot)
+      updateUserBoxMap(easyrtcid, slot)
       $(getIdOfBox(slot + 1)).css('display', 'none')
       window.$scope.userBoxMap[easyrtcid] = slot + 1
       $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'block')

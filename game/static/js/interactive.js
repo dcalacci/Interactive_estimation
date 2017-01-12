@@ -96,10 +96,9 @@ function new_unfollow_list(name, avatar, score) {
 // gets the id of the DOM element ofthe video box for user object `user`
 var getVideoBoxId = function (user) {
   try {
-    var easyRtcId = _.invert(window.easyRtcIdMap)[user.linkedId]
-    var boxId = window.userBoxMap[easyRtcId]
-    var id = "box" + boxId + "_container"
-    console.log("going to update score for user ", user.linkedId, "on boxId", id)
+    var easyRtcId = _.invert(window.$scope.easyRtcIdMap)[user.linkedId]
+    var boxId = window.$scope.userBoxMap[easyRtcId]
+    return "box" + boxId + "_container"
   } catch(err) {
     console.log("couldnt get easyRtcId mapping:", err)
   }
@@ -211,29 +210,32 @@ $(function () {
 
       // need to get the box ID from the player linked ID or username
       // then change the content of the dom in the `interactiveGuess` div under that box.
-      // $.each(data.allPlayers, function(i, user) {
-      //   if (user.guess < 0) {
-      //     user.guess = '';
-      //   }
-      //   $('#')
-      // })
-
-      // data.following = [{"username":"Test", "avatar":"cow.png", "score": 1.0}]
-      $("#following_list tbody").html("");
-      $.each(data.following, function(i, user) {
+      console.log("allplayers:", data.allPlayers)
+      $.each(data.allPlayers, function(i, user) {
         if (user.guess < 0) {
           user.guess = '';
         }
-        var avatar = "/static/"+user.avatar;
-        $("#following_list tbody").append(`
-          <tr>
-            <td id=${user.username}>
-              <img src=${avatar} class='avatar' />
-              <span>guess: ${user.guess}</span>
-            </td>
-          </tr>
-        `);
+        var vBoxId = getVideoBoxId(user)
+        // this updates also for our user; we should fix that.
+        console.log("going to update score for user ", user.linkedId, "on boxId", vBoxId)
       })
+
+      // // data.following = [{"username":"Test", "avatar":"cow.png", "score": 1.0}]
+      // $("#following_list tbody").html("");
+      // $.each(data.following, function(i, user) {
+      //   if (user.guess < 0) {
+      //     user.guess = '';
+      //   }
+      //   var avatar = "/static/"+user.avatar;
+      //   $("#following_list tbody").append(`
+      //     <tr>
+      //       <td id=${user.username}>
+      //         <img src=${avatar} class='avatar' />
+      //         <span>guess: ${user.guess}</span>
+      //       </td>
+      //     </tr>
+      //   `);
+      // })
     }
     else if(data.action == 'outcome'){
       $(".box#score").html(`${data.score}`);
@@ -292,6 +294,9 @@ $(function () {
 
     }
     else if(data.action == 'sliderChange'){
+      // this (maybe?) updates also for our user; we should fix that.
+      console.log("going to update score for user ", data.linkedId, "on boxId", vBoxId)
+      var vBoxId = getVideoBoxId(data.username)
       $(`#${data.username} > span`).html(data.slider);
     }
     else if(data.action == 'followNotify'){
