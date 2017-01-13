@@ -105,8 +105,12 @@ var getVideoBoxId = function (linkedId) {
 var updateGuess = function (linkedId, guess) {
   var containerId = getVideoBoxId(linkedId)
   var guessDom = $(containerId).children('.info-row').children('.guess')
-  console.log("Setting GUESS on element:", guessDom, "from containerId", containerId)
-  guessDom.html(`Guess: ${guess}`)
+  //console.log("Setting GUESS on element:", guessDom, "from containerId", containerId)
+  if (typeof guess === 'undefined') {
+    guessDom.html(`Waiting them to guess...`)
+  } else {
+    guessDom.html(`Guess: ${guess}`)
+  }
 }
 
 // updates the score label for each user in `users`
@@ -121,8 +125,13 @@ var updateGuesses = function (users) {
 var updateScore = function (linkedId, score) {
   var containerId = getVideoBoxId(linkedId)
   var scoreDom = $(containerId).children('.info-row').children('.score')
-  console.log("Setting SCORE on element:", scoreDom, "from containerId", containerId)
-  scoreDom.html(`Score: ${score}`)
+  //console.log("Setting SCORE on element:", scoreDom, "from containerId", containerId, linkedId, window.$scope.userBoxMap)
+  if (typeof score === 'undefined') {
+    guessDom.html(`No score yet!`)
+  } else {
+    scoreDom.html(`Their score so far: ${score}`)
+  }
+
 }
 
 // updates the score label for each user in `users`
@@ -247,7 +256,7 @@ $(function () {
       // then change the content of the dom in the `interactiveGuess` div under that box.
 
       var otherPlayers = _.filter(data.allPlayers, function (u) {
-        return u.linkedId === window.$scope.thisUser.linkedId
+        return u.linkedId !== window.$scope.thisUser.linkedId
       })
 
       otherPlayers = _.map(otherPlayers, function (u) {

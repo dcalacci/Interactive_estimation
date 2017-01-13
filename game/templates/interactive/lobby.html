@@ -4,10 +4,10 @@
 {% block breadcrumbs %}
 <div id="breadcrumbs" hidden="true">
   <ul class="nav nav-wizard">
-    <li>Current Round: <span id="currentRound"></span></li>
-    <li id="initial"><a>Initial Guess</a></li>
-    <li id="interactive"><a>Interactive Guess</a></li>
-    <li id="outcome"><a>Round Outcome</a></li>
+    <li><span style="font-weight: bold;">Current Round: <span id="currentRound"></span></li>
+    <li id="initial" class="text-center"><a class="text-center">Initial Guess</a></li>
+    <li id="interactive" class="text-center"><a class="text-center">Interactive Guess</a></li>
+    <li id="outcome" class="text-center"><a>Round Outcome</a></li>
   </ul>
 </div>
 {% endblock %}
@@ -98,7 +98,7 @@
         <img src='#' class="img-responsive" style="width: 100%"/>
       </div>
       <div>
-        Your guess: <span id="yourGuess"></span>
+          <h3>Your guess: <span class="badge badge-info" id="yourGuess"></span></h3>
       </div>
 
       <div>
@@ -109,15 +109,6 @@
 
 
     <div class="col-md-5">
-      <div class="outcome" hidden>
-        <b>You are following:</b>
-        <div>User Scores</div>
-        <table class="table table-bordered" id="unfollow_list">
-          <tbody>
-          </tbody>
-        </table>
-      </div>
-
       <!-- insert video here -->
       {% include 'components/timer.html' %}
     </div>
