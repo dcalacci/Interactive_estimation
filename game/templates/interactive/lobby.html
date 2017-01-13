@@ -38,7 +38,7 @@
         </div>
         <div class="col-md-6">
             <p class="text-center">
-                This is how you will look to other students!
+                This is how you will look to other students.
             </p>
             <video id="userBox" class="responsive-video" muted volume="0" width="237" height="180"></video>
             <div id="videoHolder">
@@ -46,6 +46,17 @@
                     Can't find your webcam... Enable it in your browser!
                 </p>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-8 text-center">
+            <h4>
+            Your group members' video streams should show up below as they join
+                the room. Say hi! Make sure you can all see and hear each other,
+                and then have one of you click "start Assignment".
+            </h4>
         </div>
     </div>
     {% endif %}
@@ -82,40 +93,42 @@
 </div>
 
 <div id="game" hidden>
-  <div class="form">
-    <div class="col-md-4 guess" hidden>
-      <div>
-          <img src='#' class="img-responsive" style="width: 100%"/>
-      </div>
-      <div id="picker">
-        {% include 'components/slider.html' %}
-        <input type="submit" value="Next" id="submit" class="btn btn-primary nextButton">
+    <div class="form">
+        <div class="row">
+    <div class="col-md-6">
+      <div id="img-div">
+          <img src='#' class="img-responsive"/>
       </div>
     </div>
+    <div class="col-md-6">
+        <div class="row" id="slider-row">
+            <div class="col-md-12">
+              <div id="picker">
+                {% include 'components/slider.html' %}
+                <input type="submit" value="Next" id="submit" class="btn btn-primary nextButton">
+              </div>
+            </div>
+        </div>
+        <div class="row" id="outcome-row">
+            <div class="col-md-12">
+            <div>
+                <h4>Your guess: <span class="badge badge-warning" id="yourGuess"></span></h4>
+            </div>
 
-    <div class="col-md-5 outcome" hidden>
-      <div>
-        <img src='#' class="img-responsive" style="width: 100%"/>
-      </div>
-      <div>
-          <h3>Your guess: <span class="badge badge-info" id="yourGuess"></span></h3>
-      </div>
-
-      <div>
-        Actual correlation: <span id="roundAnswer"></span>
-      </div>
-      <input type="submit" value="Next" id="submit" class="btn btn-primary nextButton">
+            <div>
+                <h4>Actual correlation: <span class="badge badge-primary" id="roundAnswer"></span></h4>
+            </div>
+            <input type="submit" value="Next" id="submit" class="btn btn-primary nextButton">
+            </div>
+        </div>
+        <div class="row" id="timer-row">
+            <div class="col-md-12">
+                <!-- insert video here -->
+                {% include 'components/timer.html' %}
+            </div>
+        </div>
     </div>
-
-
-    <div class="col-md-5">
-      <!-- insert video here -->
-      {% include 'components/timer.html' %}
-    </div>
-
-    <div class="col-md-5">
-      <div class="outcome" hidden>
-      </div>
+        </div>
     </div>
     
     <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

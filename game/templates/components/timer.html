@@ -4,18 +4,23 @@
 <link href="{% static 'css/timer.css' %}" rel="stylesheet">
 {% endblock %}
 
-<div>
-  <div id="timer" class="info">
-    Timer
-    <div class="box">
-      <div id="counter"></div>
+<div style="margin-top: 20px;">
+<div class="row">
+    <div class="col-md-12">
+        <h4><span id="counter" class="badge badge-danger"></span> left in this round.</h4>
     </div>
-  </div>
-  <div class="info">
-    Score 
-    <div class="box" id="score">
-      {{ user.get_score }}
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4><span id="score-result" class="badge badge-info"></span> is your score so far.</h4>
     </div>
-  </div>
-  <div class="info">Plots remaining: {{ remaining }} <span id="remaining"></span></div>
+</div>
+
+<div class="row">
+    <div class=col-md-12">
+        <h4><span id="remaining" class="badge badge-default"></span> rounds left!</h4>
+    </div>
+</div>
+
 </div>

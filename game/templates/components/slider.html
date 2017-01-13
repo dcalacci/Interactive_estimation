@@ -5,12 +5,17 @@
 {% endblock %}
 
 <div class="row">
-  <label>Your guess:&nbsp;</label><span id="correlation"></span>
+    <div class="col-md-12">
+        Your guess: <span class="badge badge-info" id="correlation"></span>
+    </div>  
 </div>
 <div class="row">
-  <label>Estimate the risk by picking a value on the slider below</label>
+    <div class="col-md-12">
+        <p>Estimate the risk by picking a value on the slider</p>
+    </div>
 </div>
-<div class='row'>
+<div class='row' id="slider-row">
+    <div class="col-md-12" id="slider-col">
   <div id="slider"></div>
   <span id="min">0</span>
   <span class="quarter">0.25</span>
@@ -18,4 +23,5 @@
   <span class="quarter">0.75</span>
   <span id="max">1</span>
   <input name="guess" id="guess" value="-1" hidden />
+    </div>
 </div>

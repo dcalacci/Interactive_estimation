@@ -56,8 +56,10 @@ function resetSlider() {
 
 function getUnusedVideoBoxes() {
   var allBoxes = [1, 2, 3, 4]
-  var filledBoxes = _.keys(window.$scope.userBoxMap)
-  var unFilledBoxes = _.without(allBoxes, filledBoxes)
+  var filledBoxes = _.values(window.$scope.userBoxMap)
+  console.log('filled boxes:', filledBoxes)
+  var unFilledBoxes = _.filter(allBoxes, function (n) { return _.indexOf(filledBoxes, n) < 0})
+  console.log("unfilled boxes:", unFilledBoxes)
   return unFilledBoxes
 }
 
@@ -70,7 +72,7 @@ function hideUnusedVideoBoxes() {
 
 function start_game(data, seconds) {
   state = data.action;
-  hideUnusedVideoBoxes()
+
   $("#myModal").modal('hide');
   $("#lobby").hide();
   $("#lobbyInfo").hide();
@@ -84,6 +86,7 @@ function start_game(data, seconds) {
 
   var audio = new Audio('/static/round-sound.mp3');
   audio.play();
+  hideUnusedVideoBoxes()
 }
 
 ////////////////////////
@@ -104,12 +107,12 @@ var getVideoBoxId = function (linkedId) {
 
 var updateGuess = function (linkedId, guess) {
   var containerId = getVideoBoxId(linkedId)
-  var guessDom = $(containerId).children('.info-row').children('.guess')
+  var guessDom = $(containerId).children('.card').children('.card-block').children('.info-row').children('.guess')
   //console.log("Setting GUESS on element:", guessDom, "from containerId", containerId)
   if (typeof guess === 'undefined') {
-    guessDom.html(`Waiting them to guess...`)
+    guessDom.html(`<span class="badge badge-pill badge-warning">guess: ...</span>`)
   } else {
-    guessDom.html(`Guess: ${guess}`)
+    guessDom.html(`<span class="badge badge-pill badge-warning">guess: ${guess}</span>`)
   }
 }
 
@@ -124,12 +127,12 @@ var updateGuesses = function (users) {
 
 var updateScore = function (linkedId, score) {
   var containerId = getVideoBoxId(linkedId)
-  var scoreDom = $(containerId).children('.info-row').children('.score')
-  //console.log("Setting SCORE on element:", scoreDom, "from containerId", containerId, linkedId, window.$scope.userBoxMap)
+  var scoreDom = $(containerId).children('.card').children('.card-block').children('.info-row').children('.score')
+  //  console.log("Setting SCORE on element:", scoreDom, "from containerId", containerId, linkedId, window.$scope.userBoxMap)
   if (typeof score === 'undefined') {
-    guessDom.html(`No score yet!`)
+    scoreDom.html(`<span class="badge badge-pill badge-warning">score: ...</span>`)
   } else {
-    scoreDom.html(`Their score so far: ${score}`)
+    scoreDom.html(`<span class="badge badge-pill badge-info">score: ${score} </span>`)
   }
 
 }
@@ -231,8 +234,8 @@ $(function () {
       $("#videoContainer").hide();
       resetSlider();
 
-      $(".guess").show();
-      $(".outcome").hide();
+      $("#slider-row").show();
+      $("#outcome-row").hide();
 
       if(data.current_round == 0) {
         var audio = new Audio('/static/bell.mp3');
@@ -244,12 +247,13 @@ $(function () {
     }
     else if(data.action == 'interactive'){
       start_game(data, data.seconds);
-      $(".guess").show(); // show guess slider
+      $("#slider-row").show();
+
 
       // need here to do the equivalent -- "show" interactive guess and score
       // values.
-      $(".interactiveGuess").show();
-      $(".box#score").html(`${data.score}`);
+      //$(".interactiveGuess").show();
+      $("#score-result").html(`${data.score}`);
       $("#videoContainer").show();
 
       // need to get the box ID from the player linked ID or username
@@ -286,12 +290,12 @@ $(function () {
       // })
     }
     else if(data.action == 'outcome'){
-      $(".box#score").html(`${data.score}`);
+      $("#score-result").html(`${data.score}`);
 
       start_game(data, data.seconds);
-      $("#interactiveGuess").hide();
-      $(".guess").hide();
-      $(".outcome").show();
+      //$("#interactiveGuess").hide();
+      $("#slider-row").hide();
+      $("#outcome-row").show();
       if(data.guess != -1) {
         $("#yourGuess").html(data.guess);
       }

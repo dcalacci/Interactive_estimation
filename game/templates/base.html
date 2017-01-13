@@ -22,26 +22,24 @@
   <body>
     <div class="m-b-1">
       <nav class="navbar navbar-dark navbar-static-top bg-faded">
-        <div class="container">
-          <span>
+          <div class="container">
+              <div class="row">
+                  <div class="col-md-3">
             <a href="/">
               <img id="logo" src={% static 'images/logo.png' %} />
             </a>
-{#            &nbsp;Guess the Correlation Game#}
-            {% if user.is_authenticated %}
-
+                  </div>
+                  {#            &nbsp;Guess the Correlation Game#}
+                  {% if user.is_authenticated %}
+                  <div class="col-md-3">
               <form class="logout" action='{% url "account_logout" %}' method="post">
-                {% if user.game_type == "i" %}
-                <span class="user">
-                  User: <img src='' class="avatar user-avatar" id="user-avatar" />
-                </span>
-                {% endif %}
                 {% csrf_token %}
                 <button class="btn btn-danger quit" type="submit">End Game</button>
               </form>
+                  </div>
               {% endif %}
           </span>
-
+              </div>
         </div>
       </nav>
     </div>
