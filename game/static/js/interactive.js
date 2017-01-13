@@ -54,8 +54,23 @@ function resetSlider() {
   $('#correlation')[0].innerHTML = '';
 }
 
+function getUnusedVideoBoxes() {
+  var allBoxes = [1, 2, 3, 4]
+  var filledBoxes = _.keys(window.$scope.userBoxMap)
+  var unFilledBoxes = _.without(allBoxes, filledBoxes)
+  return unFilledBoxes
+}
+
+function hideUnusedVideoBoxes() {
+  var unfilledBoxes = getUnusedVideoBoxes()
+  _.each(unfilledBoxes, function (boxNumber) {
+    $("#box" + boxNumber + "_videoHolder").hide()
+  })
+}
+
 function start_game(data, seconds) {
   state = data.action;
+  hideUnusedVideoBoxes()
   $("#myModal").modal('hide');
   $("#lobby").hide();
   $("#lobbyInfo").hide();
@@ -73,24 +88,6 @@ function start_game(data, seconds) {
 
 ////////////////////////
 
-function new_follow_list(name, avatar, score) {
-  $("#follow_list").append(`
-    <div class="user" id=${name}>
-      <a href="#" data-toggle="tooltip" data-placement="right" class="toolTip" title="Unfollow a user first">
-        <img src="/static/images/plus.ico" class="plusIcon" />
-      </a>
-      <img src=${avatar} class="avatar" /> <span class="userScore">score: ${score}</span><img id="coin" src="/static/images/coin.png" />
-    </div>
-  `);
-}
-
-function new_unfollow_list(name, avatar, score) {
-  return (`
-    <img src=${avatar} class='avatar' />
-    <span>Score: ${score}</span><img id="coin" src="/static/images/coin.png" />
-  `);
-}
-
 
 
 // gets the id of the DOM element ofthe video box for user object `user`
@@ -107,9 +104,9 @@ var getVideoBoxId = function (linkedId) {
 
 var updateGuess = function (linkedId, guess) {
   var containerId = getVideoBoxId(linkedId)
-  var guessDom = $(containerId).children('.guess')
+  var guessDom = $(containerId).children('.info-row').children('.guess')
   console.log("Setting GUESS on element:", guessDom, "from containerId", containerId)
-  guessDom.html(`${guess}`)
+  guessDom.html(`Guess: ${guess}`)
 }
 
 // updates the score label for each user in `users`
@@ -123,9 +120,9 @@ var updateGuesses = function (users) {
 
 var updateScore = function (linkedId, score) {
   var containerId = getVideoBoxId(linkedId)
-  var scoreDom = $(containerId).children('.score')
-  console.log("Setting GUESS on element:", scoreDom, "from containerId", containerId)
-  scoreDom.html(`${score}`)
+  var scoreDom = $(containerId).children('.info-row').children('.score')
+  console.log("Setting SCORE on element:", scoreDom, "from containerId", containerId)
+  scoreDom.html(`Score: ${score}`)
 }
 
 // updates the score label for each user in `users`
@@ -138,21 +135,34 @@ var updateScores = function (users) {
 }
 
 function start_interactive(data) {
+  console.log("allplayers:", data.allPlayers)
+  var otherPlayers = _.filter(data.allPlayers, function (u) {
+    return u.linkedId === window.$scope.thisUser.linkedId
+  })
 
-  // populate list of people you can follow
-  $("#follow_list").html("");
-  $.each(data.all_players, function(i, user) {
-    var avatar = '/static/' + user.avatar;
-    new_follow_list(user.username, avatar, user.score);
-  });
+  otherPlayers = _.map(otherPlayers, function (u) {
+    var userGuess = u.guess < 0 ? '' : u.guess
+    return _.extend(u, {guess: userGuess})
+  })
 
-  $("#unfollow_list tbody td").html("");
-  // populate list of people you can unfollow
-  $.each(data.following, function(i, user) {
-    var avatar = "/static/"+user.avatar;
-    var row = $($("#unfollow_list tbody td")[i]);
-    row.html(new_unfollow_list(user.username, avatar, user.score));
-  });
+  updateScores(otherPlayers)
+
+  // data.all_players
+
+  // // populate list of people you can follow
+  // $("#follow_list").html("");
+  // $.each(data.all_players, function(i, user) {
+  //   var avatar = '/static/' + user.avatar;
+  //   new_follow_list(user.username, avatar, user.score);
+  // });
+
+  // $("#unfollow_list tbody td").html("");
+  // // populate list of people you can unfollow
+  // $.each(data.following, function(i, user) {
+  //   var avatar = "/static/"+user.avatar;
+  //   var row = $($("#unfollow_list tbody td")[i]);
+  //   row.html(new_unfollow_list(user.username, avatar, user.score));
+  // });
 
 }
 
@@ -268,11 +278,6 @@ $(function () {
     }
     else if(data.action == 'outcome'){
       $(".box#score").html(`${data.score}`);
-      $("#unfollow_list tbody").html("");
-
-      for(var i = 0; i < data.max_following; i++) {
-        $("#unfollow_list tbody").append("<tr><td></td></tr>");
-      }
 
       start_game(data, data.seconds);
       $("#interactiveGuess").hide();
@@ -285,41 +290,41 @@ $(function () {
 
       start_interactive(data);
 
-      following = data.following.map(function(user) {
+      playerUsernames = data.allPlayers.map(function (user) { return user.username; })
+
+
+      allPlayers = data.allPlayers.map(function(user) {
         return user.username;
       });
 
-      if(following.length == data.max_following) {
-        $('[data-toggle="tooltip"]').tooltip();
-      }
+      // is this allowing people to mimic others' guesses?
+      // $(document).on("click", ".plusIcon", function(e) {
+      //   var username = e.target.parentElement.parentElement.id;
+      //   var avatar = $(`div#${username}>.avatar`).attr('src');
+      //   var score = $(`div#${username}>.userScore`).html();
 
-      $(document).on("click", ".plusIcon", function(e) {
-        var username = e.target.parentElement.parentElement.id;
-        var avatar = $(`div#${username}>.avatar`).attr('src');
-        var score = $(`div#${username}>.userScore`).html();
-
-        var followingCopy = following.slice();
-        followingCopy.push(username);
-        $('[data-toggle="tooltip"]').tooltip('hide');
-        socket.send(JSON.stringify({
-          action: 'follow',
-          following: followingCopy
-        }));
-      });
+      //   var followingCopy = following.slice();
+      //   followingCopy.push(username);
+      //   $('[data-toggle="tooltip"]').tooltip('hide');
+      //   socket.send(JSON.stringify({
+      //     action: 'follow',
+      //     following: followingCopy
+      //   }));
+      // });
 
 
-      $(document).on("click", ".unfollow", function(e) {
+      // $(document).on("click", ".unfollow", function(e) {
 
-        var username = e.target.id;
-        var toRemove = following.indexOf(username);
-        var followingCopy = following.slice();
-        followingCopy.splice(toRemove, 1);
-        socket.send(JSON.stringify({
-          action: 'follow',
-          following: followingCopy
-        }));
+      //   var username = e.target.id;
+      //   var toRemove = following.indexOf(username);
+      //   var followingCopy = following.slice();
+      //   followingCopy.splice(toRemove, 1);
+      //   socket.send(JSON.stringify({
+      //     action: 'follow',
+      //     following: followingCopy
+      //   }));
 
-      });
+      // });
 
     }
 

@@ -513,14 +513,25 @@ def outcome_loop(lim, l):
 
 
 def outcome(user, game: Interactive, round_data):
+    # TODO: rest_of_users is no longer used here! make it just all_users
     current_round = InteractiveRound.objects.get(user=user, round_order=round_data.get('current_round'))
-    rest_of_users = outcome_loop(game.constraints.score_lambda,
-                                 current_round.game.users.filter(~Q(username__in=current_round.following.
-                                                                values('username'))).exclude(username=user.username))
 
-    currently_following = outcome_loop(game.constraints.score_lambda, current_round.following.all())
+    # was used for "following" code for manipulating network structure. no longer used here.
+    # rest_of_users = outcome_loop(game.constraints.score_lambda,
+    #                              current_round.game.users.filter(~Q(username__in=current_round.following.
+    #                                                             values('username'))).exclude(username=user.username))
+
+    allPlayers = []
+    for u in game.users.all():
+        d = {
+            'username': u.username,
+            'linkedId': u.linked_id,
+            'avatar': u.get_avatar,
+            'score': u.get_score,
+        }
+        allPlayers.append(d)
 
     game.user_send(user, action='outcome', guess=float(current_round.get_influenced_guess()),
-                   score=user.get_score, following=currently_following, allPlayers=rest_of_users,
+                   score=user.get_score, allPlayers=allPlayers,
                    max_following=game.constraints.max_following, correct_answer=float(current_round.plot.answer),
                    seconds=SECONDS, **round_data)
