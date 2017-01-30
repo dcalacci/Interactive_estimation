@@ -170,6 +170,7 @@ def lobby(message):
                 user.avatar = avatar(used_avatars)
                 user.save()
                 game.users.add(user)
+                print("added user to a game")
                 break
         else:
             logging.error("User couldn't be assigned to a game")
@@ -217,6 +218,7 @@ def exit_game(message):
     game.user_channel(user).discard(message.reply_channel)
 
 
+@channel_session_user
 def ws_receive(message):
     payload = json.loads(message['text'])
     action = payload.get('action')
@@ -224,6 +226,7 @@ def ws_receive(message):
     if action:
         payload['reply_channel'] = message.content['reply_channel']
         payload['path'] = message.content.get('path')
+        logging.info("sending payload", action)
         Channel('game.route').send(payload)
     else:
         # TODO: unrecognized action
@@ -399,6 +402,7 @@ def game_state_checker(game, state, round_data, counter=0):
     if counter == SECONDS:
         # move to the next state
         if state == 'initial':
+            print("starting interactive...")
             start_interactive(game, round_data)
         elif state == 'interactive':
             start_outcome(game, round_data)
@@ -489,6 +493,7 @@ def interactive(user, game, round_data):
             'score': u.get_score,
         }
         allPlayers.append(d)
+    logging.info("Sending Interactive", user)
     game.user_send(user, action='interactive', score=user.get_score, following=following, seconds=SECONDS, allPlayers=allPlayers, **round_data)
 
 

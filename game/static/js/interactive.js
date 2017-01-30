@@ -178,6 +178,20 @@ function start_interactive(data) {
 
 }
 
+var hideVideo = function () {
+  console.log("hiding video...")
+  $("#videoContainer").hide();
+  $('.responsive-video').each(function(i, e) {
+    e.muted = true
+  });
+}
+
+var showVideo = function () {
+  $("#videoContainer").show();
+  $('.responsive-video').each(function(i, e) {
+    e.muted = false
+  });
+}
 
 
 $(function () {
@@ -212,6 +226,7 @@ $(function () {
   socket.onmessage = function (msg) {
     // console.log(msg.data);
     var data = JSON.parse(msg.data);
+    console.log("RECEIVED MESSAGE:", data)
     if(data.error){
       console.log(data.msg);
       return;
@@ -230,8 +245,9 @@ $(function () {
       $('.user-avatar').attr('src', data.url);
     }
     else if(data.action == 'initial'){
+      console.log("START OF INITIAL ROUND")
       start_game(data, data.seconds);
-      $("#videoContainer").hide();
+      hideVideo()
       resetSlider();
 
       $("#slider-row").show();
@@ -246,15 +262,15 @@ $(function () {
       console.log(data.text)
     }
     else if(data.action == 'interactive'){
+      console.log("START OF INTERACTIVE ROUND")
       start_game(data, data.seconds);
       $("#slider-row").show();
-
 
       // need here to do the equivalent -- "show" interactive guess and score
       // values.
       //$(".interactiveGuess").show();
       $("#score-result").html(`${data.score}`);
-      $("#videoContainer").show();
+      showVideo()
 
       // need to get the box ID from the player linked ID or username
       // then change the content of the dom in the `interactiveGuess` div under that box.
