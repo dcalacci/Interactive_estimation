@@ -1,4 +1,8 @@
 //timer
+if (typeof(window.$scope) === 'undefined') {
+  window.$scope = {}
+}
+
 function countdown(counterState, s) {
   var counter = $('#counter');
   var seconds = s || 30;
@@ -98,6 +102,7 @@ var getVideoBoxId = function (linkedId) {
   var linkedIdMap = _.invert(window.$scope.easyRtcIdMap)
     try {
       var easyRtcId = linkedIdMap[linkedId]
+      console.log("linked id:", linkedId, "easyrtcid:", easyRtcId, "userboxmap:", window.$scope.userBoxMap)
       var boxId = window.$scope.userBoxMap[easyRtcId]
       return "#box" + boxId + "_container"
     } catch(err) {
@@ -105,21 +110,22 @@ var getVideoBoxId = function (linkedId) {
     }
 }
 
+// DISABLED for this experiment (1/30/17)
 var updateGuess = function (linkedId, guess) {
   var containerId = getVideoBoxId(linkedId)
-  var guessDom = $(containerId).children('.card').children('.card-block').children('.info-row').children('.guess')
-  //console.log("Setting GUESS on element:", guessDom, "from containerId", containerId)
-  if (typeof guess === 'undefined') {
-    guessDom.html(`<span class="badge badge-pill badge-warning">guess: ...</span>`)
-  } else {
-    guessDom.html(`<span class="badge badge-pill badge-warning">guess: ${guess}</span>`)
-  }
+  // var guessDom = $(containerId).children('.card').children('.card-block').children('.info-row').children('.guess')
+  // //console.log("Setting GUESS on element:", guessDom, "from containerId", containerId)
+  // if (typeof guess === 'undefined') {
+  //   guessDom.html(`<span class="badge badge-pill badge-warning">guess: ...</span>`)
+  // } else {
+  //   guessDom.html(`<span class="badge badge-pill badge-warning">guess: ${guess}</span>`)
+  // }
 }
 
 // updates the score label for each user in `users`
 // players is a list of user objects
 var updateGuesses = function (users) {
-  console.log("going to update score for users")
+  console.log("going to update guesses for users")
   _.each(users, function (user) {
     updateGuess(user.linkedId, user.guess)
   })
@@ -128,36 +134,40 @@ var updateGuesses = function (users) {
 var updateScore = function (linkedId, score) {
   var containerId = getVideoBoxId(linkedId)
   var scoreDom = $(containerId).children('.card').children('.card-block').children('.info-row').children('.score')
-  //  console.log("Setting SCORE on element:", scoreDom, "from containerId", containerId, linkedId, window.$scope.userBoxMap)
+  console.log("Setting SCORE on element:", scoreDom, "container:", containerId, window.$scope.userBoxMap)
   if (typeof score === 'undefined') {
     scoreDom.html(`<span class="badge badge-pill badge-warning">score: ...</span>`)
   } else {
+    console.log("setting score to...", score)
     scoreDom.html(`<span class="badge badge-pill badge-info">score: ${score} </span>`)
   }
-
 }
 
 // updates the score label for each user in `users`
 // players is a list of user objects
 var updateScores = function (users) {
-  console.log("going to update score for users")
+  console.log("going to update score for users", users)
   _.each(users, function (user) {
     updateScore(user.linkedId, user.score)
   })
 }
 
+window.$scope.updateScores = updateScores
+
 function start_interactive(data) {
   console.log("allplayers:", data.allPlayers)
-  var otherPlayers = _.filter(data.allPlayers, function (u) {
-    return u.linkedId === window.$scope.thisUser.linkedId
+  window.$scope.otherPlayers = _.filter(data.allPlayers, function (u) {
+    return u.linkedId !== window.$scope.thisUser.linkedId
   })
 
-  otherPlayers = _.map(otherPlayers, function (u) {
+  window.$scope.otherPlayers = _.map(window.$scope.otherPlayers, function (u) {
     var userGuess = u.guess < 0 ? '' : u.guess
     return _.extend(u, {guess: userGuess})
   })
 
-  updateScores(otherPlayers)
+  console.log("other playerse:", window.$scope.otherPlayers)
+
+  updateScores(window.$scope.otherPlayers)
 
   // data.all_players
 
@@ -247,7 +257,7 @@ $(function () {
     else if(data.action == 'initial'){
       console.log("START OF INITIAL ROUND")
       start_game(data, data.seconds);
-      hideVideo()
+      hideVideo();
       resetSlider();
 
       $("#slider-row").show();
@@ -270,23 +280,23 @@ $(function () {
       // values.
       //$(".interactiveGuess").show();
       $("#score-result").html(`${data.score}`);
-      showVideo()
+      showVideo();
 
       // need to get the box ID from the player linked ID or username
       // then change the content of the dom in the `interactiveGuess` div under that box.
 
-      var otherPlayers = _.filter(data.allPlayers, function (u) {
+      window.$scope.otherPlayers = _.filter(data.allPlayers, function (u) {
         return u.linkedId !== window.$scope.thisUser.linkedId
       })
 
-      otherPlayers = _.map(otherPlayers, function (u) {
+      window.$scope.otherPlayers = _.map(window.$scope.otherPlayers, function (u) {
         var userGuess = u.guess < 0 ? '' : u.guess
         return _.extend(u, {guess: userGuess})
       })
 
       // conditional for scores...
-      updateGuesses(otherPlayers)
-      updateScores(otherPlayers)
+      updateGuesses(window.$scope.otherPlayers)
+      updateScores(window.$scope.otherPlayers)
 
       // // data.following = [{"username":"Test", "avatar":"cow.png", "score": 1.0}]
       // $("#following_list tbody").html("");
@@ -317,6 +327,7 @@ $(function () {
       }
       $("#roundAnswer").html(data.correct_answer);
 
+      console.log("allplayers:", data.allPlayers)
       start_interactive(data);
 
       playerUsernames = data.allPlayers.map(function (user) { return user.username; })
@@ -325,36 +336,6 @@ $(function () {
       allPlayers = data.allPlayers.map(function(user) {
         return user.username;
       });
-
-      // is this allowing people to mimic others' guesses?
-      // $(document).on("click", ".plusIcon", function(e) {
-      //   var username = e.target.parentElement.parentElement.id;
-      //   var avatar = $(`div#${username}>.avatar`).attr('src');
-      //   var score = $(`div#${username}>.userScore`).html();
-
-      //   var followingCopy = following.slice();
-      //   followingCopy.push(username);
-      //   $('[data-toggle="tooltip"]').tooltip('hide');
-      //   socket.send(JSON.stringify({
-      //     action: 'follow',
-      //     following: followingCopy
-      //   }));
-      // });
-
-
-      // $(document).on("click", ".unfollow", function(e) {
-
-      //   var username = e.target.id;
-      //   var toRemove = following.indexOf(username);
-      //   var followingCopy = following.slice();
-      //   followingCopy.splice(toRemove, 1);
-      //   socket.send(JSON.stringify({
-      //     action: 'follow',
-      //     following: followingCopy
-      //   }));
-
-      // });
-
     }
 
     else if(data.action == 'sliderChange'){

@@ -36,6 +36,15 @@ window.$scope = {
 
 var setEasyRtcMapping = function (easyRtcId, linkedId) {
   console.log("updated easyRTC Mapping:", easyRtcId, linkedId)
+
+  // had an issue where the id map would get real big and wobbly if we had to refresh.
+  // this should fix it.
+  if (_.includes(_.values(window.$scope.easyRtcIdMap), linkedId)) {
+    // if we already have the same linked ID
+    var oldRtcId = _.invert(window.$scope.easyRtcIdMap)[linkedId]
+    var newMap = _.omit(window.$scope.easyRtcIdMap, oldRtcId)
+    window.$scope.easyRtcIdMap = newMap
+  }
   window.$scope.easyRtcIdMap[easyRtcId] = linkedId
 }
 
@@ -87,7 +96,7 @@ function callEverybodyElse (roomName, userList, selfInfo) {
       easyrtc.call(
         user.easyrtcid,
         function success (otherCaller, mediaType) {
-          //setAndSendLinkedId(roomName, selfInfo, linkedId)
+          setAndSendLinkedId(roomName, selfInfo, linkedId)
           console.log('success', otherCaller, mediaType)
         },
         function failure (errorCode, errorMessage) {
@@ -127,6 +136,7 @@ function loginSuccess () {
   }).then(function (result) {
     console.log('meeting result:', result)
     audio.startProcessing(window.$scope)
+    window.$scope.updateScores(window.$scope.otherPlayers)
   })
 }
 
