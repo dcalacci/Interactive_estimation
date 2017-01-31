@@ -7,13 +7,30 @@ function countdown(counterState, s) {
   var counter = $('#counter');
   var seconds = s || 30;
 
+  console.log("state:", counterState)
+
   function tick() {
+    console.log("state:", counterState)
     if(counterState == state) {
       seconds--;
-      counter[0].innerHTML = "0:" + (seconds < 10 ? "0" : "") + String(seconds);
-      if( seconds > 0 ) {
+      if (seconds > 0 && seconds < 16 && state === 'interactive') {
+        counter[0].innerHTML = "0:" + (seconds < 10 ? "0" : "") + String(seconds);
+        hideVideo();
+        $('#post-interactive-instructions').show()
+        setTimeout(tick, 1000);
+      } else if ( seconds > 0 && state === "interactive") {
+        // weird dumb hack to make it count down to 0 for discussion
+        // and then give 15 seconds to individual guessing choice.
+        var textSeconds = seconds - 15
+        counter[0].innerHTML = "0:" + (textSeconds < 10 ? "0" : "") + String(textSeconds);
+        $('#interactive-instructions').show()
+        setTimeout(tick, 1000);
+      } else if (seconds > 0) {
+        counter[0].innerHTML = "0:" + (seconds < 10 ? "0" : "") + String(seconds);
         setTimeout(tick, 1000);
       } else {
+        $('#interactive-instructions').hide()
+        $('#post-interactive-instructions').hide()
         var submit = $("#submit")[0];
         submit.click();
       }
@@ -165,27 +182,7 @@ function start_interactive(data) {
     return _.extend(u, {guess: userGuess})
   })
 
-  console.log("other playerse:", window.$scope.otherPlayers)
-
   updateScores(window.$scope.otherPlayers)
-
-  // data.all_players
-
-  // // populate list of people you can follow
-  // $("#follow_list").html("");
-  // $.each(data.all_players, function(i, user) {
-  //   var avatar = '/static/' + user.avatar;
-  //   new_follow_list(user.username, avatar, user.score);
-  // });
-
-  // $("#unfollow_list tbody td").html("");
-  // // populate list of people you can unfollow
-  // $.each(data.following, function(i, user) {
-  //   var avatar = "/static/"+user.avatar;
-  //   var row = $($("#unfollow_list tbody td")[i]);
-  //   row.html(new_unfollow_list(user.username, avatar, user.score));
-  // });
-
 }
 
 var hideVideo = function () {
@@ -275,6 +272,7 @@ $(function () {
       console.log("START OF INTERACTIVE ROUND")
       start_game(data, data.seconds);
       $("#slider-row").show();
+      $('#submit').hide();
 
       // need here to do the equivalent -- "show" interactive guess and score
       // values.
@@ -316,6 +314,7 @@ $(function () {
       // })
     }
     else if(data.action == 'outcome'){
+      $('#submit').show();
       $("#score-result").html(`${data.score}`);
 
       start_game(data, data.seconds);
@@ -382,5 +381,5 @@ $('input#submit').click(function () {
   }
   else {
      console.log(state)
-  }
+ }
 });

@@ -23,6 +23,11 @@ from .utils import avatar
 from .models import Interactive, InteractiveRound, Settings
 
 SECONDS = 30
+INTERACTIVE_SECONDS = 90
+
+def group_score(allPlayers):
+    scores = [player['score'] for player in allPlayers]
+    return sum(scores) / float(len(scores))
 
 
 def get_round(game, user=None):
@@ -399,13 +404,14 @@ def twisted_error(*args, **kwargs):
 
 
 def game_state_checker(game, state, round_data, counter=0):
-    if counter == SECONDS:
-        # move to the next state
+    if state == 'interactive':
+        if counter == INTERACTIVE_SECONDS:
+            start_outcome(game, round_data)
+            return
+    elif counter == SECONDS:
         if state == 'initial':
             print("starting interactive...")
             start_interactive(game, round_data)
-        elif state == 'interactive':
-            start_outcome(game, round_data)
         else:
             start_initial(game)
         return
@@ -494,7 +500,14 @@ def interactive(user, game, round_data):
         }
         allPlayers.append(d)
     logging.info("Sending Interactive", user)
-    game.user_send(user, action='interactive', score=user.get_score, following=following, seconds=SECONDS, allPlayers=allPlayers, **round_data)
+    game.user_send(user,
+                   action='interactive',
+                   score=user.get_score,
+m                   groupScore=group_score(allPlayers),
+                   following=following,
+                   seconds=INTERACTIVE_SECONDS,
+                   allPlayers=allPlayers,
+                   **round_data)
 
 
 def start_outcome(game, round_data):
@@ -503,7 +516,11 @@ def start_outcome(game, round_data):
                                    }))
     for user in game.users.all():
         outcome(user, game, round_data)
-    task.deferLater(reactor, 1, game_state_checker, game, 'outcome', round_data).addErrback(twisted_error)
+    task.deferLater(reactor, 1,
+                    game_state_checker,
+                    game,
+                    'outcome',
+                    round_data).addErrback(twisted_error)
 
 
 def outcome_loop(lim, l):
@@ -536,7 +553,11 @@ def outcome(user, game: Interactive, round_data):
         }
         allPlayers.append(d)
 
-    game.user_send(user, action='outcome', guess=float(current_round.get_influenced_guess()),
-                   score=user.get_score, allPlayers=allPlayers,
-                   max_following=game.constraints.max_following, correct_answer=float(current_round.plot.answer),
+    game.user_send(user, action='outcome',
+                   guess=float(current_round.get_influenced_guess()),
+                   score=user.get_score,
+                   allPlayers=allPlayers,
+                   max_following=game.constraints.max_following,
+                   correct_answer=float(current_round.plot.answer),
+                   groupScore=group_score(allPlayers),
                    seconds=SECONDS, **round_data)
