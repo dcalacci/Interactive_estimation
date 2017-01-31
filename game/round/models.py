@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 # Create your models here.
@@ -16,6 +17,16 @@ class Plot(models.Model):
     def __str__(self):
         return self.plot
 
+
+class SliderValue(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+    this_round = models.ForeignKey("Round", null=True)
+    round_order = models.PositiveSmallIntegerField(null=True)
+    value = models.DecimalField(decimal_places=2, max_digits=3, null=True)
+
+    def __str__(self):
+        return "Slider {}".format(self.id)
 
 class Round(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

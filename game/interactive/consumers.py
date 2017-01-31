@@ -17,7 +17,7 @@ from django.utils import timezone
 from twisted.internet import task, reactor
 
 from game.contrib.calculate import calculate_score
-from game.round.models import Plot
+from game.round.models import Plot, SliderValue, Round
 
 from .utils import avatar
 from .models import Interactive, InteractiveRound, Settings
@@ -187,6 +187,8 @@ def lobby(message):
         user.avatar = avatar()
         user.save()
 
+
+
     game.group_channel.add(message.reply_channel)
     game.user_channel(user).add(message.reply_channel)
 
@@ -250,6 +252,13 @@ def data_broadcast(message):
             # Returns every one who followed this user on this round
             rounds = InteractiveRound.objects.filter(following=user, game=game, round_order=round_data.get('current_round'))
             # check the game and state and make sure we are on interactive mode
+
+            # create a slidervalue object (store all changes!)
+            this_round = Round.objects.get(user=user, round_order=round_data.get('current_round'))
+            val = SliderValue.objects.create(user=user,
+                                             round_order=round_data.get('current_round'),
+                                             this_round=this_round,
+                                             value=slider)
 
             for user_round in rounds.all():
                 print('Going to send data to {}'.format(user_round.user.username))
@@ -503,7 +512,7 @@ def interactive(user, game, round_data):
     game.user_send(user,
                    action='interactive',
                    score=user.get_score,
-m                   groupScore=group_score(allPlayers),
+                   groupScore=group_score(allPlayers),
                    following=following,
                    seconds=INTERACTIVE_SECONDS,
                    allPlayers=allPlayers,

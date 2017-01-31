@@ -5,9 +5,22 @@ if (typeof(window.$scope) === 'undefined') {
 
 function countdown(counterState, s) {
   var counter = $('#counter');
+  console.log("given seconds:", s)
   var seconds = s || 30;
 
   console.log("state:", counterState)
+
+  var formatTime = function (secs) {
+    var sec_num = parseInt(secs, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    return minutes+':'+seconds;
+  }
 
   function tick() {
     console.log("state:", counterState)
@@ -22,11 +35,13 @@ function countdown(counterState, s) {
         // weird dumb hack to make it count down to 0 for discussion
         // and then give 15 seconds to individual guessing choice.
         var textSeconds = seconds - 15
-        counter[0].innerHTML = "0:" + (textSeconds < 10 ? "0" : "") + String(textSeconds);
+        counter[0].innerHTML = formatTime(textSeconds)
+        //counter[0].innerHTML = "0:" + (textSeconds < 10 ? "0" : "") + String(textSeconds);
         $('#interactive-instructions').show()
         setTimeout(tick, 1000);
       } else if (seconds > 0) {
-        counter[0].innerHTML = "0:" + (seconds < 10 ? "0" : "") + String(seconds);
+        counter[0].innerHTML = formatTime(seconds)
+        //counter[0].innerHTML = "0:" + (seconds < 10 ? "0" : "") + String(seconds);
         setTimeout(tick, 1000);
       } else {
         $('#interactive-instructions').hide()
@@ -278,6 +293,7 @@ $(function () {
       // values.
       //$(".interactiveGuess").show();
       $("#score-result").html(`${data.score}`);
+      $("#group-score-result").html(`${data.groupScore}`);
       showVideo();
 
       // need to get the box ID from the player linked ID or username
@@ -316,6 +332,7 @@ $(function () {
     else if(data.action == 'outcome'){
       $('#submit').show();
       $("#score-result").html(`${data.score}`);
+      $("#group-score-result").html(`${data.groupScore}`);
 
       start_game(data, data.seconds);
       //$("#interactiveGuess").hide();
