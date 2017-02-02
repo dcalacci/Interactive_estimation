@@ -132,7 +132,8 @@ def exit_survey(request):
             return redirect('interactive:done')
         else:
             print('NOT Valid')
-    return render(request, 'control/survey.html', {'form': form, 'score': request.user.get_score})
+    return render(request, 'control/survey.html', {'form': form,
+                                                   'score': request.user.get_score})
 
 
 def done(request):

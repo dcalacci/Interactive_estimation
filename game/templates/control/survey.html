@@ -2,32 +2,63 @@
 
 {% block container %}
 <div class="survey">
-<h2>Exit Survey</h2>
- <p>Thank you for participating. Your final score is {{score}}.</p>
-  <p>You do not have to provide any information you feel uncomfortable with.</p>
-  <form class="form-inline" action="." method="post">
-    {% csrf_token %}
-      <div class="form-group">
-          {% if form.errors %}
+    <h2> That's it! </h2>
+
+    <p> How well do you think you were at predicting risk? </p>
+    <p> Your final score was {{score }}, and the group average was {{group_score}}</p>
+
+    <form class="form-inline" action="." method="post">
+        {% csrf_token %}
+            {% if form.errors %}
             {{ form.errors }}
-          {% endif %}
-      <p>Please provide your age, gender below and feedback.</p>
-      <span class="age">Age <input class="form-control" id="age" name="age"></span>
-      <span class="gender">
-      Gender
-        <input class="form-control" type="text" />
-      </span>
-    </div>
-    <div class="form-group">
-      <br>
-      <p>
-      2. Please enter any feedback, including problems you encountered.
-      </p>
-      <div class="col-xs-12">
-        <textarea class="form-control" name="feedback"></textarea>
-      </div>
-    </div>
-        <button class="btn btn-primary nextButton" type="submit">Submit HIT</button>
-  </form>
+            {% endif %}
+            <div class="row">
+            <div class="form-group">
+                <label for="skill-predict">How good do you think you are at estimating risk?</label>
+                <select class="form-control" id="skill-predict">
+                    <option>Not Good</option>
+                    <option>Somewhat Good</option>
+                    <option>Good</option>
+                    <option>Very Good</option>
+                </select>
+            </div>
+            </div>
+
+            <div class="row">
+            <fieldset class="form-group">
+                <p>Do you think talking with
+                    others in your group helped you make better estimates?</p>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" id="groupEstimateRadiosYes" value="yes" checked>
+                        Yes
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" id="groupEstimateRadiosNo" value="no">
+                        No
+                    </label>
+                </div>
+            </fieldset>
+            </div>
+            <div class="row">
+            <div class="form-group">
+                <label for="whyGroupTextArea">Why?</label>
+                <textarea class="form-control" id="whyGroupTextArea" rows="3"></textarea>
+            </div>
+            </div>
+            <div class="row">
+            <div class="form-group">
+                <label for="groupChange">How much do you think you changed your estimates after talking to your group?</label>
+                <select class="form-control" id="groupChange">
+                    <option>Not at all</option>
+                    <option>Somewhat</option>
+                    <option>Very much</option>
+                </select>
+            </div>
+            </div>
+        <button class="btn btn-primary nextButton" type="submit">Submit Assignment</button>
+    </form>
 </div>
 {% endblock %}
