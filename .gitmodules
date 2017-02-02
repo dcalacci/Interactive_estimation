@@ -4,3 +4,6 @@
 [submodule "rtc"]
 	path = rtc
 	url = https://github.com/HumanDynamics/rhythm-rtc.git
+[submodule "rhythm-server"]
+	path = rhythm-server
+	url = https://github.com/HumanDynamics/rhythm-server.git
