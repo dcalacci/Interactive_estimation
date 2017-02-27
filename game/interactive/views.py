@@ -34,7 +34,12 @@ def assign(request):
 
 def assign_with_group(request, group_id="", linked_id=""):
     print("assign with group", group_id, linked_id)
-    redirect_url = reverse("interactive:lobby_group", kwargs={'group_id': group_id, 'linked_id': linked_id})
+    if (request.GET.get('GroupID', default=False)) != False:
+        group_id = request.GET.get('GroupID', default="dummy")
+        linked_id = request.GET.get('StudentID', default="dummy")
+
+    redirect_url = reverse("interactive:lobby_group", kwargs={'group_id': group_id,
+                                                              'linked_id': linked_id})
     if request.method == 'POST':
         return redirect(redirect_url)
     return render(request, 'pages/home2.html')
