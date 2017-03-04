@@ -4,6 +4,7 @@ const utils = require('./utils')
 const audio = require('./audio')
 const io = require('socket.io-client')
 const feathers = require('feathers-client')
+const face = require('./face')
 // const easyrtc = require('easyrtc')
 
 console.log("connecting to rhythm server:", process.env.SERVER_URL)
@@ -136,6 +137,7 @@ function loginSuccess () {
   }).then(function (result) {
     console.log('meeting result:', result)
     audio.startProcessing(window.$scope)
+    face.startTracking(window.$scope)
     window.$scope.updateScores(window.$scope.otherPlayers)
   })
 }

@@ -2,9 +2,42 @@
 
 {% block container %}
 <div class="container survey">
+    <h2> Consent Form </h2>
+    This app is part of an MIT scientific project. The data you generate here
+    can be used in a research study to understand how groups communicate. By
+    Clicking "I Consent" below, you indicate that you understand the following:
 
-<h2> Consent Form </h2>
-This experiment is part of a MIT scientific project. Your decision to participate in this experiment is entirely voluntary. There are no known or anticipated risks to participating in this experiment. There is no way for us to identify you. The only information we will have, in addition to your responses, is the timestamps of your interactions with our site. The results of our research may be presented at scientific meetings or published in scientific journals. Clicking on the "AGREE" button indicates that you are at least 18 years of age, and agree to participate voluntary.
+    <ul>
+        <li>
+            You must be at least 18 to participate
+        </li>
+        <li>
+            Your participation is voluntary, and uncompensated
+        </li>
+        <li>
+            Participating will not have any positive or negative effects on the
+            class you are taking
+        </li>
+        <li>
+            You may stop contributing this data at any time by emailing cues-support@mit.edu
+        </li>
+        <li>
+            All of your data will be linked to an encrypted identifier that we
+            cannot link back to you or your online identity
+        </li>
+        <li>
+            The only information we will collect is the dynamics of your
+            conversation (e.g. who speaks, when and for how long), and
+            anonymized features from your video stream, NOT any content.
+        </li>
+        <li>
+            The possible risks of the study are minimal
+        </li>
+    </ul>
+    <br>
+    </form>
+
+</div>
 <br>
 <br>
 <form action="{{request.get_full_path}}" method="post">

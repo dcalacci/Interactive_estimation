@@ -11,7 +11,8 @@
     "gulp-envify": "^1.0.0",
     "jquery": "^3.1.0"
   },
-  "devDependencies": {
+    "devDependencies": {
+    "thumos": "https://github.com/HumanDynamics/thumos.git",
     "browser-sync": "^2.12.10",
     "del": "2.2.1",
     "gulp": "^3.9.1",
