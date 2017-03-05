@@ -28,6 +28,7 @@ window.$scope = {
   roomName: null,
   roomUsers: [],
   needToCallOtherUsers: true,
+  video: null,
   app: app,
   screenSize: 0,
   userBoxMap: {}, // easyrtcid -> box number
@@ -113,6 +114,7 @@ function callEverybodyElse (roomName, userList, selfInfo) {
 function loginSuccess () {
   console.log('Connect to EasyRTC Server')
   $('#videoHolder').css('display', 'none');
+  window.$scope.video = document.getElementById('#userBox')
   window.$scope.roomUsers.push({participant: easyrtc.myEasyrtcid, meeting: window.$scope.roomName})
   console.log(window.$scope.roomUsers)
   app.authenticate({
@@ -138,6 +140,7 @@ function loginSuccess () {
     console.log('meeting result:', result)
     audio.startProcessing(window.$scope)
     face.startTracking(window.$scope)
+    face.startFrameTracking(window.$scope)
     window.$scope.updateScores(window.$scope.otherPlayers)
   })
 }
