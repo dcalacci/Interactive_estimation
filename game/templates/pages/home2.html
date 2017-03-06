@@ -2,6 +2,7 @@
 
 {% block container %}
 <div class="container survey">
+
     <h2> Consent Form </h2>
     This app is part of an MIT scientific project. The data you generate here
     can be used in a research study to understand how groups communicate. By
@@ -22,23 +23,18 @@
             You may stop contributing this data at any time by emailing cues-support@mit.edu
         </li>
         <li>
-            All of your data will be linked to an encrypted identifier that we
+            ALl of your data will be linked to an encrypted identifier that we
             cannot link back to you or your online identity
         </li>
         <li>
             The only information we will collect is the dynamics of your
-            conversation (e.g. who speaks, when and for how long), and
-            anonymized features from your video stream, NOT any content.
+            conversation (e.g. who speaks, when and for how long), and anonymized features from your video stream,
+            NOT any content.
         </li>
         <li>
             The possible risks of the study are minimal
         </li>
     </ul>
-    <br>
-    </form>
-
-</div>
-<br>
 <br>
 <form action="{{request.get_full_path}}" method="post">
     {% csrf_token %}

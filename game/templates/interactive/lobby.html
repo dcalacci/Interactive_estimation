@@ -41,8 +41,6 @@
                 This is how you will look to other students.
             </p>
             <video id="userBox" class="responsive-video" muted volume="0" width="237" height="180"></video>
-            <canvas id="overlay" width="300" height="230"></canvas>
-            <canvas id="videoGrab" width="300" height="230" style="display: none;"></canvas>
             <div id="videoHolder">
                 <p class="text-center" id="userVideoHolderText">
                     Can't find your webcam... Enable it in your browser!
@@ -159,8 +157,10 @@
 </script>
 
 <script src="{% static "js/interactive.js" %}"></script>
-<script type="text/javascript" src="{% static "rtcjs/easyrtc.js" %}"></script>
-<script type="text/javascript" src="{% static "rtcjs/socket.io.js" %}"></script>
+<script type="text/javascript" src="https://rhythm-rtc-dev.herokuapp.com/easyrtc/easyrtc.js"></script>
+<script type="text/javascript" src="https://rhythm-rtc-dev.herokuapp.com/socket.io/socket.io.js"></script>
+
+
 <script type="text/javascript" src="{% static "js/main.js" %}"></script>
 
 {% endblock %}

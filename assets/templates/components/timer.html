@@ -1,0 +1,26 @@
+{% load staticfiles i18n %}
+
+{% block css %}
+<link href="{% static 'css/timer.css' %}" rel="stylesheet">
+{% endblock %}
+
+<div style="margin-top: 20px;">
+<div class="row">
+    <div class="col-md-12">
+        <h4><span id="counter" class="badge badge-danger"></span> left in this round.</h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4><span id="score-result" class="badge badge-info"></span> is your score so far.</h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class=col-md-12">
+        <h4><span id="remaining" class="badge badge-default"></span> rounds left!</h4>
+    </div>
+</div>
+
+</div>

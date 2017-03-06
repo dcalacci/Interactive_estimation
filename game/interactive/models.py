@@ -77,6 +77,7 @@ class Interactive(models.Model):
     start_time = models.DateTimeField(auto_now_add=True, null=True)
     end_time = models.DateTimeField(null=True)
     group = models.CharField(_('Group ID'), blank=True, max_length=255)
+    groupScore = models.FloatField(null=True)
 
     constraints = models.ForeignKey(Settings, on_delete=models.CASCADE)
 
@@ -105,11 +106,13 @@ class Survey(models.Model):
     # user = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='influenced_users')
     username = models.CharField(max_length=255, blank=True, null=True)
     game = models.OneToOneField(Interactive)
-    age = models.PositiveSmallIntegerField(null=True)
-    gender = models.CharField(max_length=10, choices=(('m', 'Male'),
-                                                      ('f', 'Female'),
-                                                      ), blank=True, null=True)
-    feedback = models.TextField(null=True)
+
+    talkingBetter = models.CharField(max_length=10, choices=(('yes', 'yes'),
+                                                             ('no', 'no')),
+                                     blank=True, null=True)
+    whyGroup = models.TextField(null=True)
+    groupChange = models.PositiveSmallIntegerField(null=True)
+    skillreport = models.PositiveSmallIntegerField(null=True)
 
     def __str__(self):
         return self.username

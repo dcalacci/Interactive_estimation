@@ -1,0 +1,85 @@
+{% load staticfiles i18n %}
+
+{% block css%}
+<link href="{% static 'css/video.css' %}" rel="stylesheet">
+{% endblock %}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row" id="videoRow">
+            <div class="col-md-3 col-center videoContainer" id="box1_container">
+                <div class="card">
+                    <div class="card-block video-card-block">
+                <div id="box1_videoHolder" class="videoHolder">
+                    <p class="text-center" id="videoHolderText">
+                        Waiting for group members...
+                    </p>
+                </div>
+                <video id="box1" class="responsive-video remote" style="display:none"></video>
+                    </div>
+                    <div class="card-block">
+                        <div class="info-row row">
+                            <div class="col-md-6 score text-center">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-center videoContainer" id="box2_container">
+                <div class="card">
+                    <div class="card-block video-card-block">
+                        <div id="box2_videoHolder" class="videoHolder">
+                            <p class="text-center" id="videoHolderText">
+                                Waiting for group members...
+                            </p>
+                        </div>
+                        <video id="box2" class="responsive-video remote" style="display:none"></video>
+                    </div>
+                    <div class="card-block">
+                        <div class="info-row row">
+                            <div class="col-md-6 score text-center">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-center videoContainer" id="box3_container">
+                <div class="card">
+                    <div class="card-block video-card-block">
+                        <div id="box3_videoHolder" class="videoHolder">
+                            <p class="text-center" id="videoHolderText">
+                                Waiting for group members...
+                            </p>
+                        </div>
+                        <video id="box3" class="responsive-video remote" style="display:none"></video>
+                    </div>
+                    <div class="card-block">
+                        <div class="info-row row">
+                            <div class="col-md-6 score text-center">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-center videoContainer" id="box4_container">
+                <div class="card">
+                    <div class="card-block video-card-block">
+                        <div id="box4_videoHolder" class="videoHolder">
+                            <p class="text-center" id="videoHolderText">
+                                Waiting for group members...
+                            </p>
+                        </div>
+                        <video id="box4" class="responsive-video remote" style="display:none"></video>
+                    </div>
+                    <div class="card-block">
+                        <div class="info-row row">
+                            <div class="col-md-6 score text-center">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

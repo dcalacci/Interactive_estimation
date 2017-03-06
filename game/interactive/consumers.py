@@ -23,6 +23,7 @@ from .utils import avatar
 from .models import Interactive, InteractiveRound, Settings
 
 SECONDS = 30
+#TODO: change this back to 90
 INTERACTIVE_SECONDS = 90
 
 def group_score(allPlayers):
@@ -561,6 +562,10 @@ def outcome(user, game: Interactive, round_data):
             'score': u.get_score,
         }
         allPlayers.append(d)
+
+    # change and save the group score
+    game.groupScore = group_score(allPlayers)
+    game.save()
 
     game.user_send(user, action='outcome',
                    guess=float(current_round.get_influenced_guess()),

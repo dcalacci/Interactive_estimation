@@ -3,6 +3,7 @@ version: '2'
 volumes:
   postgres_data: {}
   postgres_backup: {}
+  letsencrypt: {}
 
 services:
   postgres:
@@ -11,27 +12,53 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - postgres_backup:/backups
     env_file: .env
+    environment:
+      - POSTGRES_USER=game
+      - POSTGRES_PASSWORD=wisdom
 
   django:
     build:
       context: .
-      dockerfile: ./compose/django/Dockerfile
+      dockerfile: ./compose/django/Dockerfile-prod
     user: django
     depends_on:
       - postgres
       - redis
-    command: /daphne.sh
-    env_file: .env
+    environment:
+      - POSTGRES_USER=game
+      - POSTGRES_PASSWORD=wisdom
+      - USE_DOCKER=yes
+      - REDIS_URL=redis://redis:6379
+    command: /start-dev.sh
+    ports:
+      - "8000:8000"
+    links:
+      - postgres
+      - redis
 
   nginx:
-    build: ./compose/nginx
-    depends_on:
-      - django
-
+    build:
+      context: ./compose/nginx
+      dockerfile: ./Dockerfile
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+    links:
+      - django:django
+      - rtc:rtc
     ports:
-      - "0.0.0.0:80:80"
-
+      - "80:80"
+      - "443:443"
 
   redis:
     image: redis:latest
 
+  rtc:
+    build:
+      context: .
+      dockerfile: ./compose/rtc/Dockerfile-dev
+    environment:
+      - TWILIO_ID=AC1781e09fec3ca1e81f9b63378fdfbf91
+      - TWILIO_TOKEN=0a59ac90bc1cfbb271cdaa8884cf4301
+      - PORT=8083
+    ports:
+      - "8083:8083"

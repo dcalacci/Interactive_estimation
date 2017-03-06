@@ -12,11 +12,11 @@ class RoundForm(forms.Form):
 class ExitSurvey(forms.ModelForm):
     class Meta:
         model = Survey
-        fields = ['gender', 'age', 'feedback']
+        fields = ['talkingBetter', 'whyGroup', 'groupChange', 'skillreport']
 
     def __init__(self, *args, **kwargs):
         super(ExitSurvey, self).__init__(*args, **kwargs)
-        for f in ['gender', 'age', 'feedback']:
+        for f in ['talkingBetter', 'whyGroup', 'groupChange', 'skillreport']:
             self.fields[f].required = False
 
 

@@ -4,7 +4,6 @@ const utils = require('./utils')
 const audio = require('./audio')
 const io = require('socket.io-client')
 const feathers = require('feathers-client')
-const face = require('./face')
 // const easyrtc = require('easyrtc')
 
 console.log("connecting to rhythm server:", process.env.SERVER_URL)
@@ -28,7 +27,6 @@ window.$scope = {
   roomName: null,
   roomUsers: [],
   needToCallOtherUsers: true,
-  video: null,
   app: app,
   screenSize: 0,
   userBoxMap: {}, // easyrtcid -> box number
@@ -114,7 +112,6 @@ function callEverybodyElse (roomName, userList, selfInfo) {
 function loginSuccess () {
   console.log('Connect to EasyRTC Server')
   $('#videoHolder').css('display', 'none');
-  window.$scope.video = document.getElementById('#userBox')
   window.$scope.roomUsers.push({participant: easyrtc.myEasyrtcid, meeting: window.$scope.roomName})
   console.log(window.$scope.roomUsers)
   app.authenticate({
@@ -139,8 +136,6 @@ function loginSuccess () {
   }).then(function (result) {
     console.log('meeting result:', result)
     audio.startProcessing(window.$scope)
-    face.startTracking(window.$scope)
-    face.startFrameTracking(window.$scope)
     window.$scope.updateScores(window.$scope.otherPlayers)
   })
 }
@@ -156,7 +151,8 @@ function getIdOfBox (boxNum) {
 function init () {
   console.log('initializing RTC client...')
   //easyrtc.setSocketUrl("ws://rhythm-rtc-dev.herokuapp.com:80")
-  easyrtc.setSocketUrl(":8083")
+  //easyrtc.setSocketUrl("http://rtc.hd-rhythm-won.co")
+  easyrtc.setSocketUrl("https://rhythm-rtc-dev.herokuapp.com")
   easyrtc.dontAddCloseButtons()
 
 

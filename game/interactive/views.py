@@ -140,6 +140,15 @@ def exit_survey(request):
     return render(request, 'control/survey.html', {'form': form,
                                                    'score': request.user.get_score})
 
+def leaderboard(request):
+    scores = [{"group": interactive.group,
+               "score": interactive.groupScore} for interactive in Interactive.objects.all()]
+
+    scores = sorted(scores, key=lambda obj: obj['score'], reverse=True)
+    print("scores:", scores)
+
+    return render(request, "interactive/leaderboard.html", {"scores": scores})
+
 
 def done(request):
     return render(request, 'interactive/done.html')

@@ -1,6 +1,6 @@
 FROM node:boron
 
-ADD /rtc /app
+COPY /rtc /app
 WORKDIR /app
 RUN npm install
 CMD ["npm", "start"]

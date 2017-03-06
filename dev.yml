@@ -12,16 +12,19 @@ services:
       - postgres_backup_dev:/backups
     environment:
       - POSTGRES_USER=game
+      - POSTGRES_PASSWORD=wisdom
 
   nginx:
     build:
       context: ./compose/nginx
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile-dev
     links:
       - django:django
       - rtc:rtc
     ports:
       - "80:80"
+    expose:
+      - "80"
 
   django:
     build:
@@ -30,29 +33,17 @@ services:
     command: /start-dev.sh
     depends_on:
       - postgres
+      - redis
     environment:
       - POSTGRES_USER=game
+      - POSTGRES_PASSWORD=wsdom
       - USE_DOCKER=yes
-    volumes:
-      - .:/app
+      - REDIS_URL=redis://redis:6379
     ports:
       - "8000:8000"
     links:
       - postgres
       - redis
-
-  pycharm:
-    build:
-      context: .
-      dockerfile: ./compose/django/Dockerfile-dev
-    depends_on:
-      - postgres
-    environment:
-      - POSTGRES_USER=game
-    volumes:
-      - .:/app
-    links:
-      - postgres
 
   redis:
     image: redis:latest

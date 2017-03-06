@@ -1,0 +1,33 @@
+{% load staticfiles i18n %}
+
+{% block css %}
+<link href="{% static 'css/slider.css' %}" rel="stylesheet">
+{% endblock %}
+
+<div class="row">
+    <div class="col-md-12">
+        Your guess: <span class="badge badge-info" id="correlation"></span>
+    </div>  
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div id="interactive-instructions" hidden>
+            <p>Talk to your teammates and make an estimate using the slider.
+            After talking, You'll have 15 seconds to make a final estimate.</p>
+        </div>
+        <div id="solo-instructions">
+            <p>Estimate the risk by picking a value below:</p>
+        </div>
+    </div>
+</div>
+<div class='row' id="slider-row">
+    <div class="col-md-12" id="slider-col">
+  <div id="slider"></div>
+  <span id="min">0</span>
+  <span class="quarter">0.25</span>
+  <span class="quarter">0.5</span>
+  <span class="quarter">0.75</span>
+  <span id="max">1</span>
+  <input name="guess" id="guess" value="-1" hidden />
+    </div>
+</div>
