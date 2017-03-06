@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+
+{% block container %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Group ID</th>
+            <th>Group Score</th>
+        </tr>
+    </thead>
+    {% for score in scores %}
+    <tr>
+        <th scope="row">{{forloop.counter}}
+        </th>
+        <th>{{score.group}}</th>
+        <th>{{score.score}}</th>
+
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,16 @@
+#slider {
+    min-height: auto;
+    min-width: 100%;
+}
+
+#min {
+  float: left;
+}
+
+.quarter {
+  margin-left: 19%;
+}
+
+#max {
+  float: right;
+}

@@ -1,0 +1,81 @@
+{% load staticfiles i18n %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{% block title %}Risk Estimation Assignment{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    {% block css %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous">
+
+    <link href="{% static 'css/project.css' %}" rel="stylesheet">
+    <link href="{% static 'css/social.css' %}" rel="stylesheet">
+    <link href="{% static 'css/breadcrumbs.css' %}" rel="stylesheet">
+
+    {% endblock %}
+  </head>
+
+  <body>
+    <div class="m-b-1">
+      <nav class="navbar navbar-dark navbar-static-top bg-faded">
+          <div class="container">
+              <div class="row">
+                  <div class="col-md-3">
+            <a href="/">
+              <img id="logo" src={% static 'images/logo.png' %} />
+            </a>
+                  </div>
+                  {#Risk Estimation#}
+                  {% if user.is_authenticated %}
+                  <div class="col-md-3">
+              <form class="logout" action='{% url "account_logout" %}' method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger quit" type="submit">Leave Assignment</button>
+              </form>
+                  </div>
+              {% endif %}
+          </span>
+              </div>
+        </div>
+      </nav>
+    </div>
+
+    <div class="container wrapper">
+      <div class="row">
+        {% block breadcrumbs %}
+        {% endblock %}
+      </div>
+      {% block container %}
+
+      {% endblock %}
+      <div class="push"></div>
+    </div>
+    <div class="footer">
+      <div class="container">
+        Made by <a href="http://hd.media.mit.edu/">Human Dynamics</a> at <a href="https://www.media.mit.edu"/>MIT Media Lab</a>
+      </div>
+    </div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    {% block javascript %}
+      <!-- Required by Bootstrap v4 Alpha 3 -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+      <link href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css' rel='stylesheet' type='text/css'>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js" integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD" crossorigin="anonymous"></script>
+
+      <!-- Your stuff: Third-party javascript libraries go here -->
+
+      <!-- place project specific Javascript in this file -->
+
+    {% endblock javascript %}
+  {% block extra_javascript %}{% endblock %}
+  </body>
+</html>
