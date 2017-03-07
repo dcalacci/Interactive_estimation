@@ -330,6 +330,8 @@ def initial_submit(message):
             current_round = InteractiveRound.objects.get(user=user, game=game,
                                                          round_order=round_data.get('current_round'))
             current_round.guess = Decimal(guess)
+            if (message.get('submit')):
+                current_round.submitted_initial=True
             current_round.save()
         except InteractiveRound.DoesNotExist:
             message.reply_channel.send({
@@ -353,6 +355,8 @@ def interactive_submit(message):
             current_round = InteractiveRound.objects.get(user=user, game=game,
                                                          round_order=round_data.get('current_round'))
             current_round.influenced_guess = Decimal(guess)
+            if (message.get('submit')):
+                current_round.submitted_interactive=True
             current_round.save()
         except InteractiveRound.DoesNotExist:
             message.reply_channel.send({
@@ -419,7 +423,7 @@ def game_state_checker(game, state, round_data, counter=0):
         if counter == INTERACTIVE_SECONDS:
             start_outcome(game, round_data)
             return
-    elif counter == SECONDS:
+    elif counter >= SECONDS:
         if state == 'initial':
             print("starting interactive...")
             start_interactive(game, round_data)
@@ -427,23 +431,29 @@ def game_state_checker(game, state, round_data, counter=0):
             start_initial(game)
         return
 
+    #TODO: this makes the game run solely on the timer, there is no "submit"
+    #functionality anymore... hmm idea is to have submit actually just hit a
+    #method that sends out the next state, rather than have it done on state
+    #checker?
+    #... but how do you know when everyone else is done, too?
+    print("if this many are done, game is over:", len(game.users))
     if state == 'initial':
-        r = InteractiveRound.objects.filter(game=game, round_order=round_data.get('current_round'), guess=None).count()
+        r = InteractiveRound.objects.filter(game=game, round_order=round_data.get('current_round'), submitted_initial=False).count()
         if r == 0:
             start_interactive(game, round_data)
             return
     elif state == 'interactive':
         r = InteractiveRound.objects.filter(game=game, round_order=round_data.get('current_round'),
-                                            influenced_guess=None).count()
-        # if r == 0:
-        #     start_outcome(game, round_data)
-        #     return
+                                            submitted_interactive=False).count()
+        if r == 0:
+            start_outcome(game, round_data)
+            return
     elif state == 'outcome':
         r = InteractiveRound.objects.filter(game=game, round_order=round_data.get('current_round'),
                                             outcome=False).count()
-        # if r == 0:
-        #     start_initial(game)
-        #     return
+        if r == 0:
+            start_initial(game)
+            return
     counter += 1
     task.deferLater(reactor, 1, game_state_checker, game, state, round_data, counter).addErrback(twisted_error)
 

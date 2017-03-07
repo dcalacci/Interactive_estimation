@@ -191,8 +191,6 @@ var updateScores = function (users) {
   })
 }
 
-
-
 function start_interactive(data) {
   console.log("allplayers:", data.allPlayers)
   window.$scope.otherPlayers = _.filter(data.allPlayers, function (u) {
@@ -391,7 +389,8 @@ $('input#submit').click(function () {
     console.log("sending guess (initial):", guess)
     socket.send(JSON.stringify({
       action: 'initial',
-      guess: guess
+      guess: guess,
+      submit: true
     }));
   }
   else if(state == 'interactive'){
@@ -399,7 +398,8 @@ $('input#submit').click(function () {
     var guess = $('#guess').val();
     socket.send(JSON.stringify({
       action: 'interactive',
-      socialGuess: guess
+      guess: guess,
+      submit: true
     }));
   }
   else if(state == 'outcome'){

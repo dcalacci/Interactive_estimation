@@ -44,8 +44,8 @@ class Settings(models.Model):
 class InteractiveRound(Round):
     following = models.ManyToManyField(settings.AUTH_USER_MODEL, symmetrical=False, related_name='following')
     # followers = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='followers', null=True)
-
     influenced_guess = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    submitted_interactive = models.BooleanField(default=False)
     game = models.ForeignKey('Interactive', null=True, on_delete=models.CASCADE)
     outcome = models.BooleanField(default=False)
 
@@ -69,7 +69,7 @@ class InteractiveRound(Round):
         return data
 
     def get_influenced_guess(self):
-        return float(self.influenced_guess) if self.influenced_guess else -1
+        return float(self.influenced_guess) if self.influenced_guess else self.current_guess
 
 
 class Interactive(models.Model):
