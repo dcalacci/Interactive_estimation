@@ -11,7 +11,8 @@
     "gulp-envify": "^1.0.0",
     "jquery": "^3.1.0"
   },
-  "devDependencies": {
+    "devDependencies": {
+    "thumos": "https://github.com/HumanDynamics/thumos.git",
     "browser-sync": "^2.12.10",
     "del": "2.2.1",
     "gulp": "^3.9.1",
@@ -515,7 +516,7 @@
     "shasum": "1.0.2",
     "shell-quote": "0.0.1",
     "shelljs": "0.6.0",
-    "sibilant-webaudio": "0.1.2",
+    "sibilant-webaudio": "https://github.com/dcalacci/sibilant.git",
     "signal-exit": "3.0.0",
     "slash": "1.0.0",
     "slice-ansi": "0.0.4",

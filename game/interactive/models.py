@@ -113,6 +113,7 @@ class Survey(models.Model):
     whyGroup = models.TextField(null=True)
     groupChange = models.PositiveSmallIntegerField(null=True)
     skillreport = models.PositiveSmallIntegerField(null=True)
+    age = models.PositiveSmallIntegerField(null=True)
 
     def __str__(self):
         return self.username

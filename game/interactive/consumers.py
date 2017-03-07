@@ -343,7 +343,8 @@ def initial_submit(message):
 @channel_session_user
 def interactive_submit(message):
     user, game = user_and_game(message)
-    guess = message.get('socialGuess')
+    guess = message.get('guess')
+    print("got a guess:", guess, message)
     d = json.loads(cache.get(game.id))
     state = d.get('state')
     round_data = d.get('round_data')
@@ -434,15 +435,15 @@ def game_state_checker(game, state, round_data, counter=0):
     elif state == 'interactive':
         r = InteractiveRound.objects.filter(game=game, round_order=round_data.get('current_round'),
                                             influenced_guess=None).count()
-        if r == 0:
-            start_outcome(game, round_data)
-            return
+        # if r == 0:
+        #     start_outcome(game, round_data)
+        #     return
     elif state == 'outcome':
         r = InteractiveRound.objects.filter(game=game, round_order=round_data.get('current_round'),
                                             outcome=False).count()
-        if r == 0:
-            start_initial(game)
-            return
+        # if r == 0:
+        #     start_initial(game)
+        #     return
     counter += 1
     task.deferLater(reactor, 1, game_state_checker, game, state, round_data, counter).addErrback(twisted_error)
 
@@ -541,6 +542,7 @@ def outcome_loop(lim, l):
         score = calculate_score(rounds.all())
         d['score'] = score
         temp.append(d)
+    print("calculated scores:", temp)
     return temp
 
 

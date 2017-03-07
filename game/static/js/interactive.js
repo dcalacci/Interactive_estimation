@@ -66,6 +66,12 @@ $("#slider").slider({
       'action': 'slider',
       "sliderValue": ui.value
     }));
+    console.log("slider state:", state)
+    var action = state == 'interactive' ? 'interactive' : 'initial'
+    socket.send(JSON.stringify({
+      action: action,
+      guess: ui.value
+    }));
   },
   change: function(event, ui) {
     $('.ui-slider-handle').show();
@@ -164,6 +170,7 @@ var updateGuesses = function (users) {
 }
 
 var updateScore = function (linkedId, score) {
+  console.log("I should be able to update a score:", linkedId, score)
   var containerId = getVideoBoxId(linkedId)
   var scoreDom = $(containerId).children('.card').children('.card-block').children('.info-row').children('.score')
   console.log("Setting SCORE on element:", scoreDom, "container:", containerId, window.$scope.userBoxMap)
@@ -184,7 +191,7 @@ var updateScores = function (users) {
   })
 }
 
-window.$scope.updateScores = updateScores
+
 
 function start_interactive(data) {
   console.log("allplayers:", data.allPlayers)
@@ -220,6 +227,8 @@ $(function () {
   var gameId = "";
   var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
   var ws_path = ws_scheme + '://' + window.location.host + "/multiplayer/lobby/" + groupId;
+
+  window.$scope.updateScores = updateScores
 
   // console.log("Connecting to " + ws_path);
   socket = new ReconnectingWebSocket(ws_path);
@@ -379,12 +388,14 @@ $('input#submit').click(function () {
 
   if (state == 'initial') {
     var guess = $('#guess').val();
+    console.log("sending guess (initial):", guess)
     socket.send(JSON.stringify({
       action: 'initial',
       guess: guess
     }));
   }
   else if(state == 'interactive'){
+    copnsole.log("sending guess (interactive):", guess)
     var guess = $('#guess').val();
     socket.send(JSON.stringify({
       action: 'interactive',

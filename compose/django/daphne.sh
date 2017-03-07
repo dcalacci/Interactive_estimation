@@ -4,5 +4,5 @@
 #daphne -v2 config.asgi:channel_layer -b 0.0.0.0 -p 5000 --root-path=/app 
 #python /app/prod.py runserver 0.0.0.0:5000
 
-python manage.py migrate
+# python manage.py migrate
 python manage.py runserver 0.0.0.0:8000

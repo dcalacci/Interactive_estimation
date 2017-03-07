@@ -15,7 +15,8 @@ function processAudio (scope) {
         'participant': easyrtc.myEasyrtcid,
         'meeting': scope.roomName,
         'startTime': data.start.toISOString(),
-        'endTime': data.end.toISOString()
+        'endTime': data.end.toISOString(),
+        'volumes': data.volumes
       }).then(function (res) {
         //// console.log('speaking event recorded!', res)
         var start = new Date(res['startTime'])

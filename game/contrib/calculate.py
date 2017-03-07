@@ -19,6 +19,7 @@ def calculate_score(rounds):
         else:
             guess = r.guess
         if guess is None:
+            print("guess was none :(", r)
             continue
         answer = r.plot.answer
         error = math.fabs(answer - guess)
