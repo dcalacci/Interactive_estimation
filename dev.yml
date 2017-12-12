@@ -36,7 +36,7 @@ services:
       - redis
     environment:
       - POSTGRES_USER=game
-      - POSTGRES_PASSWORD=wsdom
+      - POSTGRES_PASSWORD=wisdom
       - USE_DOCKER=yes
       - REDIS_URL=redis://redis:6379
     ports:

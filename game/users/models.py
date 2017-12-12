@@ -22,7 +22,7 @@ class User(AbstractUser):
     game_type = models.CharField(_('User Type'), max_length=10, choices=(
         ('c', 'Control'),
         ('i', 'Interactive'),
-    ))
+    ), default='c')
     linked_id = models.CharField(_('Linked User ID'), blank=True, max_length=255)
     avatar = models.URLField(null=True)
 

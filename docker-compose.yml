@@ -29,25 +29,17 @@ services:
       - POSTGRES_PASSWORD=wisdom
       - USE_DOCKER=yes
       - REDIS_URL=redis://redis:6379
+      - VIRTUAL_HOST=hd-rhythm-won.co
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=hd-rhythm-won.co
+      - LETSENCRYPT_EMAIL=dcalacci@media.mit.edu
     command: /start-dev.sh
     ports:
       - "8000:8000"
     links:
       - postgres
       - redis
-
-  nginx:
-    build:
-      context: ./compose/nginx
-      dockerfile: ./Dockerfile
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-    links:
-      - django:django
-      - rtc:rtc
-    ports:
-      - "80:80"
-      - "443:443"
 
   redis:
     image: redis:latest
@@ -60,5 +52,48 @@ services:
       - TWILIO_ID=AC1781e09fec3ca1e81f9b63378fdfbf91
       - TWILIO_TOKEN=0a59ac90bc1cfbb271cdaa8884cf4301
       - PORT=8083
+      - VIRTUAL_HOST=hd-rhythm-won.co
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_PORT=8083
+      - LETSENCRYPT_HOST=hd-rhythm-won.co
+      - LETSENCRYPT_EMAIL=dcalacci@media.mit.edu
     ports:
       - "8083:8083"
+
+  nginx:
+    restart: always
+    image: nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/etc/nginx/conf.d"
+      - "/etc/nginx/vhost.d"
+      - "/usr/share/nginx/html"
+      - "./config/proxy/certs:/etc/nginx/certs:ro"
+
+  nginx-gen:
+    restart: always
+    build: 
+      context: ./compose/nginx
+      dockerfile: ./Dockerfile-gen
+    container_name: nginx-gen
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+    volumes_from:
+      - nginx
+    entrypoint: /usr/local/bin/docker-gen -notify-sighup nginx -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+
+  letsencrypt-nginx-proxy-companion:
+    restart: always
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt-nginx-proxy-companion
+    volumes_from:
+      - nginx
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./config/proxy/certs:/etc/nginx/certs:rw"
+    environment:
+      - NGINX_DOCKER_GEN_CONTAINER=nginx-gen
+

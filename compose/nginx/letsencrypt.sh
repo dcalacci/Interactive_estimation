@@ -17,3 +17,4 @@ docker run -it --rm --name letsencrypt \
        -d {{ domain }} \
        -m {{ email }}
 
+docker kill --signal=HUP {{ proxy_docker_container }}
