@@ -144,7 +144,14 @@ def leaderboard(request):
     scores = [{"group": interactive.group,
                "score": interactive.groupScore} for interactive in Interactive.objects.all()]
 
-    scores = sorted(scores, key=lambda obj: obj['score'], reverse=True)
+    scores = filter(lambda x: str.isdigit(x['group']), scores)
+
+    def score_sorter (score):
+        if not score['score']:
+            return 0
+        return score['score']
+
+    scores = sorted(scores, key=score_sorter, reverse=True)
     print("scores:", scores)
 
     return render(request, "interactive/leaderboard.html", {"scores": scores})

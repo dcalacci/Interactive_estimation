@@ -287,7 +287,7 @@ function loginSuccess () {
     console.log('auth result:', result)
     return socket.emit('meetingJoined', {
       participant: easyrtc.myEasyrtcid,
-      name: easyrtc.myEasyrtcid,
+      name: window.$scope.thisUser.linkedId,
       participants: window.$scope.roomUsers,
       meeting: window.$scope.roomName,
       meetingUrl: location.href,
@@ -315,7 +315,7 @@ function getIdOfBox (boxNum) {
 
 function init () {
   console.log('initializing RTC client...')
-  //easyrtc.setSocketUrl("ws://rhythm-rtc-dev.herokuapp.com:80")
+  easyrtc.setSocketUrl("https://rhythm-rtc-dev.herokuapp.com")
   //easyrtc.setSocketUrl(":8083")
   easyrtc.dontAddCloseButtons()
 
@@ -46254,7 +46254,6 @@ function speakingDetectionNode (audioContext, analyser, threshold, emitter) {
   var speakingTimes = []
   var quietHistory = [] // only contains continuous 'quiet' times
   var currentVolume = -Infinity
-  var volumes = []
 
   var hasStoppedSpeaking = function () {
     return (_.max(quietHistory) - _.min(quietHistory) > 500)
@@ -46265,8 +46264,6 @@ function speakingDetectionNode (audioContext, analyser, threshold, emitter) {
     analyser.getFloatFrequencyData(fftBins)
     var maxVolume = _.max(_.filter(fftBins, function (v) { return v < 0 }))
     currentVolume = maxVolume
-    volumes.push({timestamp: Date.now(),
-                  vol: currentVolume})
     emitter.trigger('volumeChange', currentVolume)
     // speaking, add the date to the stack, clear quiet record
     if (currentVolume > threshold) {
@@ -46275,8 +46272,7 @@ function speakingDetectionNode (audioContext, analyser, threshold, emitter) {
       quietHistory = []
     } else if (speakingTimes.length > 0) {
       if (hasStoppedSpeaking()) {
-        emitter.trigger('stoppedSpeaking', {'start': _.min(speakingTimes), 'end': _.max(speakingTimes), 'volumes': volumes})
-        volumes = []
+        emitter.trigger('stoppedSpeaking', {'start': _.min(speakingTimes), 'end': _.max(speakingTimes)})
         speakingTimes = []
       } else {
         quietHistory.push(new Date())
@@ -53567,9 +53563,7 @@ var Thumos = function (videoId, overlayId, drawModel, delta=500) {
   var self = this
   var video = document.getElementById(videoId)
   var overlay = document.getElementById(overlayId)
-  if (drawModel) {
-    var overlayCC = overlay.getContext('2d')
-  }
+  var overlayCC = overlay.getContext('2d')
   var positions
 
   var ctrack = new clm.tracker({useWebGL: true})
@@ -53583,6 +53577,8 @@ var Thumos = function (videoId, overlayId, drawModel, delta=500) {
 
   function emit () {
     setInterval(function () {
+      var deltaPositions = []
+      var startPositions = positions
       var endPositions
       var startTime
       var endTime
@@ -53593,14 +53589,20 @@ var Thumos = function (videoId, overlayId, drawModel, delta=500) {
         endPositions = positions
         if (endPositions && endPositions.length) {
           endTime = new Date()
-          for (var i = 0; i < endPositions.length; i++) {
+          for (var i = 0; i < startPositions.length; i++) {
+            // find euclidean differences between start and end points and average that
+            deltaPositions.push(Math.sqrt(Math.pow(endPositions[i][0] - startPositions[i][0], 2) + Math.pow(endPositions[i][1] - startPositions[i][1], 2)))
             x_array.push(endPositions[i][0])
             y_array.push(endPositions[i][1])
           }
-          self.trigger('faceMoving',
-                       {'time': new Date(),
-                        'xArray': x_array,
-                        'yArray': y_array})
+          if (deltaPositions && deltaPositions.length) {
+            var faceDelta = deltaPositions.reduce(function (a, b) { return a + b }) / deltaPositions.length
+            self.trigger('faceMoving', {'now': new Date(),
+                                        'delta': faceDelta,
+                                        'array': deltaPositions,
+                                        'xArray': x_array,
+                                        'yArray': y_array})
+          }
         }
       }, delta)
     }, delta)
@@ -53608,9 +53610,7 @@ var Thumos = function (videoId, overlayId, drawModel, delta=500) {
 
   function update () {
     raf(update)
-    if (drawModel) {
-      overlayCC.clearRect(0, 0, video.videoWidth, video.videoHeight)
-    }
+    overlayCC.clearRect(0, 0, video.videoWidth, video.videoHeight)
     positions = ctrack.getCurrentPosition()
     if (positions && drawModel) {
       ctrack.draw(overlay)

@@ -127,7 +127,7 @@ function loginSuccess () {
     console.log('auth result:', result)
     return socket.emit('meetingJoined', {
       participant: easyrtc.myEasyrtcid,
-      name: easyrtc.myEasyrtcid,
+      name: window.$scope.thisUser.linkedId,
       participants: window.$scope.roomUsers,
       meeting: window.$scope.roomName,
       meetingUrl: location.href,
@@ -155,7 +155,7 @@ function getIdOfBox (boxNum) {
 
 function init () {
   console.log('initializing RTC client...')
-  //easyrtc.setSocketUrl("ws://rhythm-rtc-dev.herokuapp.com:80")
+  easyrtc.setSocketUrl("https://rhythm-rtc-dev.herokuapp.com")
   //easyrtc.setSocketUrl(":8083")
   easyrtc.dontAddCloseButtons()
 
