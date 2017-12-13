@@ -29,10 +29,10 @@ services:
       - POSTGRES_PASSWORD=wisdom
       - USE_DOCKER=yes
       - REDIS_URL=redis://redis:6379
-      - VIRTUAL_HOST=hd-rhythm-won.co
+      - VIRTUAL_HOST=carcosa.media.mit.edu
       - VIRTUAL_NETWORK=nginx-proxy
       - VIRTUAL_PORT=8000
-      - LETSENCRYPT_HOST=hd-rhythm-won.co
+      - LETSENCRYPT_HOST=carcosa.media.mit.edu
       - LETSENCRYPT_EMAIL=dcalacci@media.mit.edu
     command: /start-dev.sh
     ports:
@@ -52,10 +52,10 @@ services:
       - TWILIO_ID=AC1781e09fec3ca1e81f9b63378fdfbf91
       - TWILIO_TOKEN=0a59ac90bc1cfbb271cdaa8884cf4301
       - PORT=8083
-      - VIRTUAL_HOST=hd-rhythm-won.co
+      - VIRTUAL_HOST=carcosa.media.mit.edu
       - VIRTUAL_NETWORK=nginx-proxy
       - VIRTUAL_PORT=8083
-      - LETSENCRYPT_HOST=hd-rhythm-won.co
+      - LETSENCRYPT_HOST=carcosa.media.mit.edu
       - LETSENCRYPT_EMAIL=dcalacci@media.mit.edu
     ports:
       - "8083:8083"
