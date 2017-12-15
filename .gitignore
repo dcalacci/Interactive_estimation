@@ -68,6 +68,9 @@ node_modules/
 # User-uploaded media
 game/media/
 
+# generated files
+game/static/js/main.js
+
 # Hitch directory
 tests/.hitch
 
