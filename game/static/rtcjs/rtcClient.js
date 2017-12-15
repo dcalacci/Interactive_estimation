@@ -155,8 +155,9 @@ function getIdOfBox (boxNum) {
 
 function init () {
   console.log('initializing RTC client...')
-  easyrtc.setSocketUrl("https://rhythm-rtc-dev.herokuapp.com")
-  //easyrtc.setSocketUrl(":8083")
+  //TODO make this a setting if we keep easyrtc
+  // easyrtc.setSocketUrl("https://rhythm-rtc-dev.herokuapp.com")
+  easyrtc.setSocketUrl(":8083")
   easyrtc.dontAddCloseButtons()
 
 
