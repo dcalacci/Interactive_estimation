@@ -1,0 +1,38 @@
+FROM node:boron
+
+COPY /rtc /app
+WORKDIR /app
+RUN npm install
+CMD ["npm", "start"]
+
+
+
+# RUN mkdir -p /app/rtc
+# WORKDIR /app/rtc
+# ADD package.json /app/rtc
+# #RUN npm install
+
+# ADD . /app/rtc
+
+# # run cd /app/rtc; npm start
+# RUN cd /app/rtc;
+# RUN npm install
+
+# CMD [ "npm", "start" ]
+
+# CMD [ "node", "/app/rtc/server.js" ]
+
+
+# # Create app directory
+# RUN mkdir -p /app/rtc/
+# WORKDIR /app/rtc/
+
+# # Install app dependencies
+# COPY package.json /app/rtc/
+# RUN npm install
+
+# COPY . /app/rtc/
+
+# WORKDIR /app/rtc/
+
+# CMD [ "npm", "start" ]

@@ -3,92 +3,148 @@
 
 {% block breadcrumbs %}
 <div id="breadcrumbs" hidden="true">
-  <ul class="nav nav-wizard">
-    <li>Current Round: <span id="currentRound"></span></li>
-    <li id="initial"><a>Initial Guess</a></li>
-    <li id="interactive"><a>Interactive Guess</a></li>
-    <li id="outcome"><a>Round Outcome</a></li>
-  </ul>
+    <ul class="nav nav-wizard">
+        <li><span style="font-weight: bold;">Current Round: <span id="currentRound"></span></li>
+            <li id="initial" class="text-center"><a class="text-center">Initial Guess</a></li>
+            <li id="interactive" class="text-center"><a class="text-center">Interactive Guess</a></li>
+            <li id="outcome" class="text-center"><a>Round Outcome</a></li>
+    </ul>
 </div>
 {% endblock %}
 
 {% block container %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"/>
 
-<div id="lobby">
-  <div class="row">
-      <div class="col-md-12" id="waiting">Waiting for other players...</div>
-  </div>
-  <p>Please wait a few moments while we try to find the needed participants.</p>
-  <p>If we can't find enough participants within {{lobbyTimeout}} minutes, we will end the HIT and pay you for your time.</p>
-  <p>Please make sure your sound is on as a bell will ring to indicate the start of a new game.</p>
+<div id="lobby" class="container">
+    <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-12 text-center">
+            <h2 class="text-center"> You're in the assignment lobby! </h2>
+            {% if not request.groupId %}
+            <p> We're waiting on a few more people to join the lobby.</p>
+            {% else %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h3> We're waiting on the rest of your group to join the lobby before you start the assignment. </h3>
+            <p> As group members join the lobby, you should be able to chat with
+                them over videoconference below. When you all agree that the group is
+                ready to start the assignment, one of you should click "start
+                assignment" below to begin!</p>
+            <p> Make sure that your video and audio work by looking at the box
+                on the right. The page should ask for access to your camera, and you
+                should see a green outline around the video feed when you speak. Try
+                it out!</p>
+        </div>
+        <div class="col-md-6">
+            <p class="text-center">
+                This is how you will look to other students.
+            </p>
+            <video id="userBox" class="responsive-video" muted volume="0" width="237" height="180"></video>
+            <canvas id="overlay" width="300" height="230"></canvas>
+            <canvas id="videoGrab" width="300" height="230" style="display: none;"></canvas>
+            <div id="videoHolder">
+                <p class="text-center" id="userVideoHolderText">
+                    Can't find your webcam... Enable it in your browser!
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-8 text-center">
+            <h4>
+                Your group members' video streams should show up below as they join
+                the room. Say hi! Make sure you can all see and hear each other,
+                and then have one of you click "start Assignment".
+            </h4>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="container" id="videoContainer">
+    {%include 'components/video.html' %}
+</div>
+
+
+<div class="row" id="startButtonRow" style="margin-top: 30px;">
+    <div class="col-md-5 col-center">
+        <p class="text-center"> When you're all here and you've agreed that you're ready, click the button below to start!</p>
+        <button id="startButton" type="button" class="btn btn-primary">Start Assignment!</button>
+    </div>
+</div>
+
+<div class="container" id="lobbyInfo">
+    <div class="row" style="margin-top: 50px;">
+        <div class="col-md-12">
+            {% if not request.linkedId %}
+            <p class="text-center">We don't have a linked ID for you..</p>
+            {% else %}
+            <p class="text-center">We think you're have a linked ID '{{request.linkedId}}'.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" id="waiting">
+            <p class="text-center">There are currently <span id="connected_players">0</span> group
+                members in the lobby. We think you're in group '{{request.groupId}}'.</p>
+        </div>
+    </div>
 </div>
 
 <div id="game" hidden>
-  <div class="form">
-  
-    <div class="col-md-6 guess" hidden>
-      <h3>Guess the correlation</h3>
-      <div>
-        <img src='#' class="img-responsive"/>
-      </div>
-      <div id="picker">
-        {% include 'components/slider.html' %}
-      </div>
-    </div>
+    <h5 class="text-center"><span id="group-score-result" class="badge badge-info"></span> is the group's mean score so far. Try and maximize it!</h5>
+    <div class="form">
+        <div class="row">
+            <div class="col-md-6">
+                <div id="img-div">
+                    <img src='#' class="img-responsive"/>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row" id="slider-row">
+                    <div class="col-md-12">
+                        <div id="picker">
+                            {% include 'components/slider.html' %}
+                            <input type="submit" value="Next" id="submit" class="btn btn-primary nextButton">
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="outcome-row">
+                    <div class="col-md-12">
+                        <div>
+                            <h4>Your guess: <span class="badge badge-warning" id="yourGuess"></span></h4>
+                        </div>
 
-    <div class="col-md-6 outcome" hidden>
-      <h3>Your results</h3>
-      <div>
-        <img src='#' class="img-responsive"/>
-      </div>
-      <div>
-        Your guess: <span id="yourGuess"></span>
-      </div>
-
-      <div>
-        Actual correlation: <span id="roundAnswer"></span>
-      </div>
-      <input type="submit" value="Next" id="submit" class="btn btn-primary nextButton">
-    </div>
-
-
-    <div class="col-md-3">
-      <div class="outcome" hidden>
-        <b>You are following:</b>
-        <table class="table table-bordered" id="unfollow_list">
-          <tbody>
-          </tbody>
-        </table>
-      </div>
-
-      <div id="interactiveGuess" hidden>
-        <div><b>You are following:</b></div>
-        <table class="table table-bordered" id="following_list">
-          <tbody>
-          </tbody>
-        </table>
-      </div>
-      {% include 'components/timer.html' %}
-    </div>
-
-    <div class="col-md-3">
-      <div class="outcome" hidden>
-        <b>You can follow:</b>
-        <div id="follow_list">
+                        <div>
+                            <h4>Actual correlation: <span class="badge badge-primary" id="roundAnswer"></span></h4>
+                        </div>
+                        <input type="submit" value="Next" id="submit" class="btn btn-primary nextButton">
+                    </div>
+                </div>
+                <div class="row" id="timer-row">
+                    <div class="col-md-12">
+                        <!-- insert video here -->
+                        {% include 'components/timer.html' %}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-    
+
     <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-body">
-            Waiting for other players...
-          </div>
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    Waiting for other players...
+                    <img src='/static/images/loading.gif' class="loading"/>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 </div>
 
 
@@ -96,8 +152,17 @@
 
 
 {% block extra_javascript %}
-    <script src="{% static "js/reconnecting-websocket.min.js" %}" type="text/javascript"></script>
+<script src="{% static "js/reconnecting-websocket.min.js" %}" type="text/javascript"></script>
+<script>
+ var groupId = "{{request.groupId}}" == "" ? null : "{{request.groupId}}"
+ var linkedId = "{{request.linkedId}}" == "" ? null : "{{request.linkedId}}"
+</script>
 
-    <script src="{% static "js/interactive.js" %}"></script>
+<script src="{% static "js/interactive.js" %}"></script>
+<script type="text/javascript" src="{% static "js/socket.io.js" %}"></script>
+<script type="text/javascript" src="{% static "js/easyrtc.js" %}"></script>
+
+
+<script type="text/javascript" src="{% static "js/main.js" %}"></script>
 
 {% endblock %}

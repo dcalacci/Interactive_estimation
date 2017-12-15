@@ -6,6 +6,9 @@ ENV PYTHONUNBUFFERED 1
 COPY ./requirements /requirements
 RUN pip install -r /requirements/local.txt
 
+ADD . /app
+# RUN chown -R django /app
+
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -17,3 +20,5 @@ RUN chmod +x /start-dev.sh
 WORKDIR /app
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+WORKDIR /app

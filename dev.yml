@@ -12,6 +12,19 @@ services:
       - postgres_backup_dev:/backups
     environment:
       - POSTGRES_USER=game
+      - POSTGRES_PASSWORD=wisdom
+
+  nginx:
+    build:
+      context: ./compose/nginx
+      dockerfile: ./Dockerfile-dev
+    links:
+      - django:django
+      - rtc:rtc
+    ports:
+      - "80:80"
+    expose:
+      - "80"
 
   django:
     build:
@@ -20,36 +33,33 @@ services:
     command: /start-dev.sh
     depends_on:
       - postgres
+      - redis
     environment:
       - POSTGRES_USER=game
+      - POSTGRES_PASSWORD=wisdom
       - USE_DOCKER=yes
-    volumes:
-      - .:/app
+      - REDIS_URL=redis://redis:6379
     ports:
       - "8000:8000"
     links:
       - postgres
       - redis
 
-
-
-  pycharm:
-    build:
-      context: .
-      dockerfile: ./compose/django/Dockerfile-dev
-    depends_on:
-      - postgres
-    environment:
-      - POSTGRES_USER=game
-    volumes:
-      - .:/app
-    links:
-      - postgres
-
-
-
   redis:
     image: redis:latest
+
+  rtc:
+    build:
+      context: .
+      dockerfile: ./compose/rtc/Dockerfile-dev
+    environment:
+      - TWILIO_ID=AC1781e09fec3ca1e81f9b63378fdfbf91
+      - TWILIO_TOKEN=0a59ac90bc1cfbb271cdaa8884cf4301
+      - PORT=8083
+    volumes:
+      - ./rtc:/rtc
+    ports:
+      - "8083:8083"
 
 
 

@@ -1,0 +1,3 @@
+FROM jwilder/docker-gen
+
+COPY ./config/proxy/templates /etc/docker-gen/templates

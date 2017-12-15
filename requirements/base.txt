@@ -49,5 +49,7 @@ redis>=2.10.0
 
 
 # Your custom requirements go here
-channels==0.17.2
+channels==0.14.2
 asgi-redis==0.14.1
+daphne==0.12.1
+Twisted==16.2.0

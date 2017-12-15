@@ -44,10 +44,12 @@ ul.nav-wizard li {
     margin: 0;
     font-size: 16px;
     line-height: 46px;
+    width: 100%;
 }
 ul.nav-wizard li a {
     color: #000033;
     padding: 0;
+    min-width: 100%;
 }
 ul.nav-wizard li a:hover {
     background-color: transparent;
