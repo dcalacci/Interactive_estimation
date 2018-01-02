@@ -5,11 +5,12 @@ const audio = require('./audio')
 const io = require('socket.io-client')
 const feathers = require('feathers-client')
 const face = require('./face')
-// const easyrtc = require('easyrtc')
 
-console.log("connecting to rhythm server:", process.env.SERVER_URL)
+console.log('connecting to rhythm server:', process.env.RHYTHM_SERVER_URL)
+// global var 'groupId' is given by django
+// global var 'linkedId' is given by django
 
-var socket = io(process.env.SERVER_URL, {
+var socket = io(process.env.RHYTHM_SERVER_URL, {
   'transports': [
     'websocket',
     'flashsocket',
@@ -26,38 +27,56 @@ const app = feathers()
 
 window.$scope = {
   roomName: null,
-  roomUsers: [],
-  needToCallOtherUsers: true,
   video: null,
   app: app,
   screenSize: 0,
-  userBoxMap: {}, // easyrtcid -> box number
-  easyRtcIdMap: {}, // easyrtcid -> linkedId
-  thisUser: ""
+  userBoxMap: { 'box1': '', 'box2': '', 'box3': '', 'box4': ''}, // box number -> rtcid 
+  thisUser: {}
 }
 
-var setEasyRtcMapping = function (easyRtcId, linkedId) {
-  console.log("updated easyRTC Mapping:", easyRtcId, linkedId)
+var webrtc;
 
-  // had an issue where the id map would get real big and wobbly if we had to refresh.
-  // this should fix it.
-  if (_.includes(_.values(window.$scope.easyRtcIdMap), linkedId)) {
-    // if we already have the same linked ID
-    var oldRtcId = _.invert(window.$scope.easyRtcIdMap)[linkedId]
-    var newMap = _.omit(window.$scope.easyRtcIdMap, oldRtcId)
-    window.$scope.easyRtcIdMap = newMap
+var allocSlot = function (peer) {
+  var slot
+  var sorted_keys = Object.keys(window.$scope.userBoxMap).sort()
+  for (var i = 0; i < sorted_keys.length; i++) {
+    var key = sorted_keys[i]
+    if (window.$scope.userBoxMap[key] === '') {
+      slot = key
+      break;
+    }
   }
-  window.$scope.easyRtcIdMap[easyRtcId] = linkedId
+
+  window.$scope.userBoxMap[slot] = peer.id 
+  return slot
 }
+
+var getSlotByPeer = function(peer) {
+  var slot 
+  $.each(window.$scope.userBoxMap, function(key, val) {
+    // TODO user id or nick?
+    // id is rtc id and nick is linkedId
+    if (val === peer.id) {
+      slot = key
+    }
+  })
+
+  return slot
+}
+
+var freeSlot = function(slot) {
+  window.$scope.userBoxMap[slot] = '' 
+}
+
 
 // easyRtcId -> linkedId
 var getLinkedId = function (easyrtcid) {
-  return $scope.easyRtcIdMap[easyrtcid]
+  return $scope.rtcIdMap[easyrtcid]
 }
 
 // linkedId -> easyRtcId
-var getEasyRtcId = function (linkedId) {
-  return _.invert($scope.easyRtcIdMap)[linkedId]
+var getRtcId = function (linkedId) {
+  return _.invert($scope.rtcIdMap)[linkedId]
 }
 
 // need to:
@@ -66,68 +85,33 @@ var getEasyRtcId = function (linkedId) {
 ///////////////////////////////////////////////////////////////
 
 
-// setPeerListener function. Updates this users mapping between easyRtcId and
-// linkedId.
-var updateLocalEasyRtcMap = function (senderId, msgData) {
-  setEasyRtcMapping(senderId, msgData.linkedId)
-}
-
-
 // send this users' linked ID to all other connected users every time
 // room occupants change -- this is to keep a link between our own user IDs
 // and the easyRTCIds.
 var setAndSendLinkedId = function (roomName, selfInfo, linkedId) {
-  console.log("sending linked ID:", selfInfo.easyrtcid, linkedId, "to", roomName)
+  console.log('sending linked ID:', selfInfo.rtcid, linkedId, 'to', roomName)
   window.$scope.thisUser = {
-    easyrtcid: selfInfo.easyrtcid,
+    rtcid: selfInfo.rtcid,
     linkedId: linkedId
-  }
-  easyrtc.sendDataWS({targetRoom: roomName}, 'linkedId',
-                     {easyRtcId: selfInfo.easyrtcid,
-                      linkedId: linkedId})
-  setEasyRtcMapping(selfInfo.easyrtcid, linkedId)
-}
-
-function callEverybodyElse (roomName, userList, selfInfo) {
-  setAndSendLinkedId(roomName, selfInfo, linkedId)
-  console.log("calling other users, info:", roomName, userList, selfInfo)
-  if (window.$scope.needToCallOtherUsers) {
-    console.log('need to call other users:', userList)
-    _.forEach(userList, (user) => {
-      console.log('trying to call user:', user)
-      easyrtc.call(
-        user.easyrtcid,
-        function success (otherCaller, mediaType) {
-          setAndSendLinkedId(roomName, selfInfo, linkedId)
-          console.log('success', otherCaller, mediaType)
-        },
-        function failure (errorCode, errorMessage) {
-          console.log('failure', errorCode, errorMessage)
-        }
-      )
-    })
-    window.$scope.needToCallOtherUsers = false
-    screenLogic()
   }
 }
 
 function loginSuccess () {
-  console.log('Connect to EasyRTC Server')
   $('#videoHolder').css('display', 'none');
   window.$scope.video = document.getElementById('#userBox')
-  window.$scope.roomUsers.push({participant: easyrtc.myEasyrtcid, meeting: window.$scope.roomName})
-  console.log(window.$scope.roomUsers)
+  window.$scope.thisUser = { rtcId: window.$scope.sessionId, linkedId: linkedId }
+
   app.authenticate({
       type: 'local',
       email: process.env.RHYTHM_SERVER_EMAIL,
       password: process.env.RHYTHM_SERVER_PASSWORD
-    // email: 'default-user-email',
-    // password: 'default-user-password'
   }).then(function (result) {
     console.log('auth result:', result)
     return socket.emit('meetingJoined', {
-      participant: easyrtc.myEasyrtcid,
+      participant: window.$scope.thisUser.linkedId,
+      // TODO ???
       name: window.$scope.thisUser.linkedId,
+      // TODO i think this is wrong
       participants: window.$scope.roomUsers,
       meeting: window.$scope.roomName,
       meetingUrl: location.href,
@@ -149,77 +133,59 @@ function loginFailure (errorCode, errorText) {
   console.log("couldn't log into server:", errorCode, errorText);
 }
 
-function getIdOfBox (boxNum) {
-  return '#box' + boxNum
+function getDomPrefix (slot) {
+  return '#' + slot
 }
 
 function init () {
   console.log('initializing RTC client...')
-  //TODO make this a setting if we keep easyrtc
-  // easyrtc.setSocketUrl("https://rhythm-rtc-dev.herokuapp.com")
-  easyrtc.setSocketUrl(":8083")
-  easyrtc.dontAddCloseButtons()
+  webrtc = new SimpleWebRTC({
+    // the id/element dom element that will hold 'our' video
+    localVideoEl: 'userBox',
+    // set to '' so we can add & style them manually on videoAdded
+    remoteVideosEl: '',
+    // immediately ask for camera access
+    autoRequestMedia: true,
+    // TODO populate signalMasterUrl
+    url: process.env.SIGNALMASTER_URL,
+    // make the user's nick the linkedId so we don't have to keep track of it    
+    nick: linkedId
+  });
 
+  console.log(process.env.SIGNALMASTER_URL)
 
-  easyrtc.setPeerListener(function (senderId, msgType, msgData, targeting) {
-    if (msgType === 'linkedId') {
-      updateLocalEasyRtcMap(senderId, msgData)
-    }
+  webrtc.on('connectionReady', function(sessionId) {
+    window.$scope.sessionId = sessionId
+    loginSuccess()
+    joinRoom()
   })
 
-  easyrtc.setRoomEntryListener(function (entry, roomName) {
-    console.log('entered room!')
-    window.$scope.needToCallOtherUsers = true
-  })
-
-  easyrtc.setRoomOccupantListener(callEverybodyElse)
-
-  joinRoom()
-
-  easyrtc.easyApp('rhythm.party',
-                  'userBox',
-                  ['box1', 'box2', 'box3', 'box4'],
-                  loginSuccess,
-                  loginFailure)
-
-  easyrtc.setDisconnectListener(function () {
-    easyrtc.showError('LOST-CONNECTION', 'Lost connection to signaling server')
-  })
-
-  var updateUserBoxMap = function (easyrtcid, slot) {
-    console.log("associating box", slot, "with id", easyrtcid)
-    window.$scope.userBoxMap[easyrtcid] = slot
-  }
-
-  var removeUserBoxMap = function (easyrtcid) {
-    window.$scope.userBoxMap = _.omit(window.$scope.userBoxMap, easyrtcid)
-  }
-
-  easyrtc.setOnCall(function (easyrtcid, slot) {
-    console.log('getConnection count=' + easyrtc.getConnectionCount())
-    window.$scope.roomUsers.push({participant: easyrtcid, meeting: window.$scope.roomName})
-    updateUserBoxMap(easyrtcid, slot + 1)
-    //    console.log($(getIdOfBox(slot + 1) + "_container"))
-    $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'none')
-    //$(getIdOfBox(slot + 1) + "_container").css('display', 'unset')
-    $(getIdOfBox(slot + 1)).css('display', 'unset')
+  webrtc.on('videoAdded', function (video, peer) { 
+    console.log('videoAdded')
+    var slot = allocSlot(peer) 
+    console.log('slot: ', slot)
+    var domPrefix = getDomPrefix(slot)
+    $(domPrefix + '_videoPlaceHolder').css('display', 'none')
+    var videoContainer = document.getElementById(slot + '_container')
+    video.className = 'responsive-video remote'
+    videoContainer.appendChild(video)
+    console.log('appended video')
     screenLogic()
   })
 
-  easyrtc.setOnHangup(function (easyrtcid, slot) {
-    setTimeout(function () {
-      //updateUserBoxMap(easyrtcid, slot)
-      $(getIdOfBox(slot + 1)).css('display', 'none')
-      removeUserBoxMap(easyrtcid)
-      $(getIdOfBox(slot + 1) + "_videoHolder").css('display', 'block')
-      screenLogic()
-    }, 20)
+  webrtc.on('videoRemoved', function (video, peer) { 
+    var slot = getSlotByPeer(peer) 
+    var domPrefix = getDomPrefix(slot)
+    $(domPrefix + '_videoPlaceHolder').css('display', 'block')
+    var videoContainer = document.getElementById(slot + '_container')
+    var el = document.getElementById(webrtc.getDomId(peer));
+    videoContainer.removeChild(el)
+    freeSlot(slot)
+    screenLogic()
   })
 
   $('#leaveRoomLink').click(function () {
-    easyrtc.leaveRoom(groupId, function () {
-      console.log("left room:", groupId)
-    })
+    webrtc.leaveRoom()
   })
 }
 
@@ -227,16 +193,20 @@ function joinRoom () {
   // pull roomName from global groupId, given by django template.
   window.$scope.roomName = groupId
   if (window.$scope.roomName === null || window.$scope.roomName === '' || window.$scope.roomName === 'null') {
-    console.log("No group ID / Room name, doing nothing...")
+    console.log('No group ID / Room name, doing nothing...')
   } else {
-    easyrtc.joinRoom(window.$scope.roomName, {}, function (e) { console.log("success"); }, function (e) { console.log('failure'); })
-    console.log('entered room: ' + window.$scope.roomName)
-//    $('#roomIndicator').html("Currently in room '" + window.$scope.roomName + "'")
+    // TODO simplewebrtc join room
+    webrtc.on('readyToCall', function () {
+      webrtc.joinRoom(window.$scope.roomName);
+      console.log('entered room: ' + window.$scope.roomName)
+    });
+    // $('#roomIndicator').html("Currently in room '" + window.$scope.roomName + "'")
   }
 }
 
 function screenLogic () {
   // this is the  function that controls the sizing of remote callers on screen
+  // TODO port to simplewebrtc
   if (window.$scope.screenSize !== 0) {
     $('.remote').removeClass('m' + window.$scope.screenSize)
   }

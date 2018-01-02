@@ -83,30 +83,26 @@ $red: #b94a48;
 
 #userBox {
     float: none;
+    left: 20%;
     position: absolute;
-    top: 50%;
-    left: 50%;
     transform: translateY(-50%)translateX(-50%);
 }
 
-#videoHolder {
+#videoPlaceHolder {
     float: none;
     position: absolute;
-    top: 50%;
-    left: 50%;
+    left: 20%;
     transform: translateY(-50%)translateX(-50%);
     max-width: 100%;
-    width: 237px;
-    height: 180px;
 }
 
-.videoHolder {
+.videoPlaceHolder {
     min-width: 100%;
     min-height: 150px;
     background-color: gray;
 }
 
-#userVideoHolderText {
+#userVideoPlaceHolderText {
     float: none;
     position: absolute;
     top: 50%;
@@ -121,7 +117,7 @@ $red: #b94a48;
     padding-bottom: 30px;
 }
 
-#videoHolderText {
+.videoPlaceHolderText {
     float: none;
     position: absolute;
     top: 50%;

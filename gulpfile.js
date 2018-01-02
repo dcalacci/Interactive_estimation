@@ -23,6 +23,12 @@ var gulp = require('gulp'),
       browserify = require('gulp-browserify'),
       env = require('gulp-env');
 
+var environ = {
+  RHYTHM_SERVER_EMAIL: "default-user-email",
+  RHYTHM_SERVER_PASSWORD: "default-user-password",
+  RHYTHM_SERVER_URL: "http://localhost:3000",
+  SIGNALMASTER_URL: "http://localhost:8888"
+}
 
 // Relative paths function
 var pathsConfig = function (appName) {
@@ -71,7 +77,7 @@ gulp.task('scripts', function() {
 gulp.task('browserify', function () {
   return gulp.src(paths.rtcjs + '/main.js')
     .pipe(browserify())
-    .pipe(envify())
+    .pipe(envify(environ))
     .pipe(gulp.dest(paths.js))
 })
 

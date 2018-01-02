@@ -137,6 +137,7 @@ function start_game(data, seconds) {
 
 // gets the id of the DOM element ofthe video box for user object `user`
 var getVideoBoxId = function (linkedId) {
+  // TODO easy -> simple
   var linkedIdMap = _.invert(window.$scope.easyRtcIdMap)
     try {
       var easyRtcId = linkedIdMap[linkedId]

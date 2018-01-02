@@ -1,9 +1,10 @@
 /* global easyrtc*/
 const Sibilant = require('sibilant-webaudio')
 
-function processAudio (scope) {
+function processAudio (scope, stream) {
   // console.log('preparing to process audio....')
-  var speakingEvents = new Sibilant(easyrtc.getLocalStream(), {passThrough: false})
+  // TODO sipleweb
+  var speakingEvents = new Sibilant(stream, {passThrough: false})
   speakingEvents.bind('speaking', function () {
     document.querySelector('#userBox').style.border = '5px solid #27ae60'
     // console.log('speaking!')
@@ -12,7 +13,8 @@ function processAudio (scope) {
   speakingEvents.bind('stoppedSpeaking', function (data) {
     scope.app.service('utterances').create(
       {
-        'participant': easyrtc.myEasyrtcid,
+        // TODO simpleweb
+        'participant': scope.thisUser.linkedId,
         'meeting': scope.roomName,
         'startTime': data.start.toISOString(),
         'endTime': data.end.toISOString(),
