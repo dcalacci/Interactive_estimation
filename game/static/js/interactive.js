@@ -116,9 +116,10 @@ function start_game(data, seconds) {
   state = data.action;
 
   $("#myModal").modal('hide');
-  $("#lobby").hide();
   $("#lobbyInfo").hide();
+  $("#lobbyText").hide();
   $("#startButtonRow").hide();
+
   set_breadcrumbs(state, data.current_round);
   $("#game").show();
 
@@ -137,15 +138,16 @@ function start_game(data, seconds) {
 
 // gets the id of the DOM element ofthe video box for user object `user`
 var getVideoBoxId = function (linkedId) {
-  // TODO easy -> simple
-  var linkedIdMap = _.invert(window.$scope.easyRtcIdMap)
     try {
-      var easyRtcId = linkedIdMap[linkedId]
-      console.log("linked id:", linkedId, "easyrtcid:", easyRtcId, "userboxmap:", window.$scope.userBoxMap)
-      var boxId = window.$scope.userBoxMap[easyRtcId]
-      return "#box" + boxId + "_container"
+      var boxId;
+      $.each(window.$scope.userBoxMap, function(key, val) {
+        if (val === linkedId) {
+          boxId = key
+        }
+      })
+      return "#" + boxId + "_container"
     } catch(err) {
-      console.log("couldnt get easyRtcId mapping:", err)
+      console.log("couldnt get video box id:", err)
     }
 }
 

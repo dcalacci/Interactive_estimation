@@ -36,8 +36,11 @@ window.$scope = {
 
 var webrtc;
 
+// slots are allocated and freed on video added + removed, respectively
+// works kinda like malloc
 var allocSlot = function (peer) {
   var slot
+  // this is a littleeee clunky 
   var sorted_keys = Object.keys(window.$scope.userBoxMap).sort()
   for (var i = 0; i < sorted_keys.length; i++) {
     var key = sorted_keys[i]
@@ -47,7 +50,7 @@ var allocSlot = function (peer) {
     }
   }
 
-  window.$scope.userBoxMap[slot] = peer.id 
+  window.$scope.userBoxMap[slot] = peer.nick 
   return slot
 }
 
@@ -56,7 +59,8 @@ var getSlotByPeer = function(peer) {
   $.each(window.$scope.userBoxMap, function(key, val) {
     // TODO user id or nick?
     // id is rtc id and nick is linkedId
-    if (val === peer.id) {
+    // not sure it matters tbh
+    if (val === peer.nick) {
       slot = key
     }
   })
@@ -70,13 +74,11 @@ var freeSlot = function(slot) {
 
 
 // easyRtcId -> linkedId
-var getLinkedId = function (easyrtcid) {
-  return $scope.rtcIdMap[easyrtcid]
-}
-
-// linkedId -> easyRtcId
-var getRtcId = function (linkedId) {
-  return _.invert($scope.rtcIdMap)[linkedId]
+var updateLinkedIds = function () {
+  peers = webrtc.getPeers(window.$scope.sessionId)
+  $.each(peers, function(peer) {
+      window.$scope.rtcIdMap[peer.id] = peer.nick
+  })
 }
 
 // need to:
@@ -85,20 +87,10 @@ var getRtcId = function (linkedId) {
 ///////////////////////////////////////////////////////////////
 
 
-// send this users' linked ID to all other connected users every time
-// room occupants change -- this is to keep a link between our own user IDs
-// and the easyRTCIds.
-var setAndSendLinkedId = function (roomName, selfInfo, linkedId) {
-  console.log('sending linked ID:', selfInfo.rtcid, linkedId, 'to', roomName)
-  window.$scope.thisUser = {
-    rtcid: selfInfo.rtcid,
-    linkedId: linkedId
-  }
-}
 
 function loginSuccess () {
   $('#videoHolder').css('display', 'none');
-  window.$scope.video = document.getElementById('#userBox')
+  window.$scope.video = document.getElementById('userBox')
   window.$scope.thisUser = { rtcId: window.$scope.sessionId, linkedId: linkedId }
 
   app.authenticate({
@@ -122,8 +114,8 @@ function loginSuccess () {
     console.log('ERROR:', err)
   }).then(function (result) {
     console.log('meeting result:', result)
-    audio.startProcessing(window.$scope)
-    face.startTracking(window.$scope)
+    // audio.startProcessing(window.$scope)
+    // face.startTracking(window.$scope)
     //face.startFrameTracking(window.$scope)
     window.$scope.updateScores(window.$scope.otherPlayers)
   })
@@ -146,6 +138,11 @@ function init () {
     remoteVideosEl: '',
     // immediately ask for camera access
     autoRequestMedia: true,
+    localVideo: {
+      autoplay: true,
+      mirror: true,
+      muted: true
+    },
     // TODO populate signalMasterUrl
     url: process.env.SIGNALMASTER_URL,
     // make the user's nick the linkedId so we don't have to keep track of it    
@@ -170,7 +167,7 @@ function init () {
     video.className = 'responsive-video remote'
     videoContainer.appendChild(video)
     console.log('appended video')
-    screenLogic()
+    // screenLogic()
   })
 
   webrtc.on('videoRemoved', function (video, peer) { 
@@ -181,7 +178,7 @@ function init () {
     var el = document.getElementById(webrtc.getDomId(peer));
     videoContainer.removeChild(el)
     freeSlot(slot)
-    screenLogic()
+    // screenLogic()
   })
 
   $('#leaveRoomLink').click(function () {
@@ -199,6 +196,7 @@ function joinRoom () {
     webrtc.on('readyToCall', function () {
       webrtc.joinRoom(window.$scope.roomName);
       console.log('entered room: ' + window.$scope.roomName)
+      updateLinkedIds()
     });
     // $('#roomIndicator').html("Currently in room '" + window.$scope.roomName + "'")
   }

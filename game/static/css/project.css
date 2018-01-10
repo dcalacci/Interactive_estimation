@@ -30,11 +30,10 @@
 /* #videoWrapper { */
 /*     display: table; */
 /* } */
-#userBox {
+.user-video {
   float: none;
   left: 20%;
-  position: absolute;
-  transform: translateY(-50%) translateX(-50%); }
+  position: absolute; }
 
 #videoPlaceHolder {
   float: none;

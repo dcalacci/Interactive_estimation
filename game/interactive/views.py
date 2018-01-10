@@ -47,7 +47,7 @@ def assign_with_group(request, group_id="", linked_id=""):
 
 # Create your views here.
 def lobby(request, group_id="", linked_id=""):
-    if request.user.is_anonymous:
+    if request.user.is_anonymous or request.user.linked_id != linked_id:
         u, password = random_user('i', linked_id=linked_id)
         u = authenticate(username=u.username, password=password)
         request.groupId = group_id

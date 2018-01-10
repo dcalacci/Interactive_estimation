@@ -322,6 +322,7 @@ def follow_list(message):
 def initial_submit(message):
     user, game = user_and_game(message)
     guess = message.get('guess')
+    print("got a guess:", guess, message)
     d = json.loads(cache.get(game.id))
     state = d.get('state')
     round_data = d.get('round_data')
@@ -436,7 +437,7 @@ def game_state_checker(game, state, round_data, counter=0):
     #method that sends out the next state, rather than have it done on state
     #checker?
     #... but how do you know when everyone else is done, too?
-    print("if this many are done, game is over:", len(game.users))
+    print("if this many are done, game is over:", len(game.users.all()))
     if state == 'initial':
         r = InteractiveRound.objects.filter(game=game, round_order=round_data.get('current_round'), submitted_initial=False).count()
         if r == 0:
