@@ -24,6 +24,7 @@ Basic Commands
 Setting Up Your Users
 ^^^^^^^^^^^^^^^^^^^^^
 
+
 * To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
 
 * To create an **superuser account**, use this command::
@@ -35,57 +36,18 @@ For convenience, you can keep your normal user logged in on Chrome and your supe
 Test coverage
 ^^^^^^^^^^^^^
 
-To run the tests, check your test coverage, and generate an HTML coverage report::
-
-    $ coverage run manage.py test
-    $ coverage html
-    $ open htmlcov/index.html
-
-Running tests with py.test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-::
-
-  $ py.test
-
-
-Live reloading and Sass CSS compilation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Moved to `Live reloading and SASS compilation`_.
-
-.. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
-
-
-
-
-
-
-
-
-Sentry
-^^^^^^
-
-Sentry is an error logging aggregator service. You can sign up for a free account at  https://getsentry.com/signup/?code=cookiecutter  or download and host it yourself.
-The system is setup with reasonable defaults, including 404 logging and integration with the WSGI application.
-
-You must set the DSN url in production.
-
+lol
 
 
 
 Deployment
 ----------
-
-
-
-
-
-Docker
-^^^^^^
-
-See detailed `cookiecutter-django Docker documentation`_.
-
-.. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
-
+dev **deploy**::
+  $ gulp build
+  $ docker-compose -f dev.yml build
+  $ docker-compose -f dev.yml up
+  $ docker-compose -f dev.yml run django /app/manage.py loaddata fixtures/initial_round.json
+  
+The loaddata command must be run after `docker-compose up` has been run at least once (for migrations)
+There's probably a way around that but I haven't looked into it yet
 
