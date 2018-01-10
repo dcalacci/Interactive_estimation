@@ -328,9 +328,13 @@ def initial_submit(message):
     round_data = d.get('round_data')
     if state == 'initial':
         try:
-            current_round = InteractiveRound.objects.get(user=user, game=game,
+            current_round = InteractiveRound.objects.get(user=user,
+                                                         game=game,
                                                          round_order=round_data.get('current_round'))
+            # set "initial" guess of current round, as well as
+            # the influenced guess that will be used in the next round.
             current_round.guess = Decimal(guess)
+            current_round.influenced_guess = Decimal(guess)
             if (message.get('submit')):
                 current_round.submitted_initial=True
             current_round.save()
