@@ -1,7 +1,11 @@
+# deprecated / not maintained
+
+This was a fork of the original netwise game, adding realtime, face-to-face interaction. We ran a pilot but it hasn't gone anywhere since then. 
+
 Game
 ==============================
 
-It
+
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
      :target: https://github.com/pydanny/cookiecutter-django/
